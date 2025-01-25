@@ -1,18 +1,19 @@
 import { Link, NavLink } from "react-router-dom";
 import { FaChalkboardTeacher } from "react-icons/fa";
-import {  useState } from "react";
+import { useContext, useState } from "react";
+import { AuthContext } from "../provider/AuthProvider";
 import Hamburger from "hamburger-react";
 
 const Navbar = () => {
-    // const { user, logOut } = useContext(AuthContext);
+    const { user, logOut } = useContext(AuthContext);
     const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-    // const handleLogout = () => {
-    //     logOut()
-    //         .then(() => { })
-    //         .catch(err => console.log(err));
-    // };
-    let user=''
+    const handleLogout = () => {
+        logOut()
+            .then(() => { })
+            .catch(err => console.log(err));
+    };
+
     const navLinks = (
         <>
             <li>
@@ -114,7 +115,7 @@ const Navbar = () => {
                                 </li>
                                 <li>
                                     <button 
-                                     
+                                        onClick={handleLogout}
                                         className="hover:bg-gray-100 rounded-lg text-left"
                                     >
                                         Logout
@@ -124,7 +125,7 @@ const Navbar = () => {
                         </div>
                     ) : (
                         <NavLink 
-                            to="/login"
+                            to="/auth/login"
                             className="btn btn-primary text-white"
                         >
                             Sign In
