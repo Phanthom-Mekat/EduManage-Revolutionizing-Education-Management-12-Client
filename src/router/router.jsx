@@ -4,6 +4,8 @@ import Home from "../pages/Home/Home";
 import AuthLayout from "../layout/AuthLayout";
 import Login from "../components/Login";
 import Register from "../components/Register";
+import AllClasses from "@/pages/class/AllClasses";
+import TeachForm from "@/pages/teach/TeachForm";
 
 const router = createBrowserRouter([
     {
@@ -14,6 +16,13 @@ const router = createBrowserRouter([
                 path: '/',
                 element: <Home />
             },
+            {
+                path: '/all-classes',
+                element: <AllClasses/>,
+            },{
+                path: '/teach',
+                element: <TeachForm/>
+            }
 
         ]
 

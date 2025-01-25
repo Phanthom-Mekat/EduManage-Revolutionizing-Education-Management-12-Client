@@ -45,7 +45,7 @@ const Banner = () => {
     };
 
     return (
-        <section className="banner relative w-full h-[480px] sm:h-[520px] md:h-[550px] lg:h-[600px] xl:h-[650px] mb-5">
+        <section className="banner relative w-full h-[480px] sm:h-[520px] md:h-[550px] lg:h-[600px] xl:h-[650px] ">
             <div className="relative w-full h-full overflow-hidden">
                 {slides.map((slide, index) => (
                     <div
