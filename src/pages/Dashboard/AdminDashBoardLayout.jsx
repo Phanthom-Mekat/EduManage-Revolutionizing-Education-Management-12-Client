@@ -22,7 +22,7 @@ const AdminDashboardLayout = () => {
           </div>
           <ul className="flex flex-col py-4">
             <li>
-              <Link to="/admin/dashboard" className="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-100">
+              <Link to="/admin" className="flex items-center px-6 py-3 text-gray-700 hover:bg-blue-100">
                 <LayoutDashboard className="mr-3" />
                 Dashboard
               </Link>
