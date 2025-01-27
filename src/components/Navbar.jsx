@@ -13,7 +13,6 @@ const Navbar = () => {
             .then(() => { })
             .catch(err => console.log(err));
     };
-
     const navLinks = (
         <>
             <li>
@@ -93,7 +92,7 @@ const Navbar = () => {
                             <label tabIndex={0} className="btn btn-ghost btn-circle avatar">
                                 <div className="w-10 rounded-full">
                                     <img 
-                                        src={user?.photoURL || "https://i.ibb.co/4Y3N8vM/avatar.png"} 
+                                        src={user?.photoURL?.split("?")[0] || "https://via.placeholder.com/150"}
                                         alt="user-profile" 
                                     />
                                 </div>

@@ -5,7 +5,7 @@ import { Eye, EyeOff, Mail, Lock, User, Image, AlertCircle, DiamondPlus } from '
 import toast, { Toaster } from "react-hot-toast";
 import { AuthContext } from "../provider/AuthProvider";
 import Lottie from "lottie-react";
-import LottieLogin from '../assets/login.json'
+import LottieLogin from '../assets/login.json';
 
 const Register = () => {
     const { createNewUser, setUser, updateUserProfile, signInWithGoogle } = useContext(AuthContext);
@@ -18,19 +18,38 @@ const Register = () => {
     const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
     const validatePassword = (password) => {
-        if (password.length < 6) {
-            return "Password should be at least 6 characters";
-        }
-        if (!/[A-Z]/.test(password)) {
-            return "Password should have at least one uppercase letter";
-        }
-        if (!/[a-z]/.test(password)) {
-            return "Password should have at least one lowercase letter";
-        }
+        if (password.length < 6) return "Password should be at least 6 characters";
+        if (!/[A-Z]/.test(password)) return "Password should have at least one uppercase letter";
+        if (!/[a-z]/.test(password)) return "Password should have at least one lowercase letter";
         return null;
     };
 
-    const handleSubmit = (e) => {
+    const registerUserInDB = async (userData) => {
+        try {
+            const response = await fetch('http://localhost:5000/users', {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(userData)
+            });
+            
+            const data = await response.json();
+            
+            if (response.ok) {
+                toast.success("Registration successful!");
+                return true;
+            } else {
+                toast.error(data.message || "Registration failed");
+                return false;
+            }
+        } catch (error) {
+            toast.error("Error connecting to server");
+            return false;
+        }
+    };
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
         const form = new FormData(e.target);
@@ -52,66 +71,52 @@ const Register = () => {
             return;
         }
 
-        createNewUser(email, password)
-            .then((result) => {
-                const user = result.user;
-                setUser(user);
-                // console.log(user);
-                updateUserProfile({ displayName: name, photoURL: photo })
-                    .then(() => {
-                        navigate(location?.state ? location.state : "/");
-                        toast.success("Registered successfully.");
+        try {
+            const result = await createNewUser(email, password);
+            const user = result.user;
+            setUser(user);
 
-                        const newUser = { name, email, photo,role: 'student' }
-                        fetch('http://localhost:5000/users', {
-                            method: "POST",
-                            headers: {
-                                "content-type": "application/json"
-                            },
-                            body: JSON.stringify(newUser)
-                        })
-                            .then(res => res.json())
-                            .then(data => {
-                                // console.log(data);
-                                if (data.insertedId) {
-                                    toast.success("Registered successfully.");
-                                }
-                            })
-                    })
-                    .catch((err) => console.log(err));
-            })
-            .catch((err) => {
-                // console.log(err);
-                setError({ register: err.message });
-            });
+            await updateUserProfile({ displayName: name, photoURL: photo });
+
+            const userData = {
+                uid: user.uid,
+                name,
+                email,
+                photo,
+                role: 'student'
+            };
+
+            const registered = await registerUserInDB(userData);
+            if (registered) {
+                navigate(location?.state ? location.state : "/");
+            }
+        } catch (err) {
+            setError({ register: err.message });
+        }
     };
 
-    const handleGoogleSignIn = () => {
-        signInWithGoogle()
-            .then((result) => {
-                const user = result.user;
-                setUser(user);
+    const handleGoogleSignIn = async () => {
+        try {
+            const result = await signInWithGoogle();
+            const user = result.user;
+            setUser(user);
+
+            const userData = {
+                uid: user.uid,
+                name: user.displayName,
+                email: user.email,
+                photo: user.photoURL,
+                role: 'student'
+            };
+
+            const registered = await registerUserInDB(userData);
+            if (registered) {
                 navigate(location?.state ? location.state : "/");
-                toast.success("Signed in successfully with Google!");
-                fetch('http://localhost:5000/users', {
-                    method: "POST",
-                    headers: {
-                        "content-type": "application/json"
-                    },
-                    body: JSON.stringify({ name: user.displayName, email: user.email, photo: user.photoURL,role: 'student' })
-                })
-                    .then(res => res.json())
-                    .then(data => {
-                        // console.log(data);
-                        if (data.insertedId) {
-                            toast.success("Signed in successfully.");
-                        }
-                    })
-            })
-            .catch((err) => {
-                console.log(err);
-                setError({ google: err.message });
-            });
+            }
+        } catch (err) {
+            console.error(err);
+            setError({ google: err.message });
+        }
     };
 
     return (
