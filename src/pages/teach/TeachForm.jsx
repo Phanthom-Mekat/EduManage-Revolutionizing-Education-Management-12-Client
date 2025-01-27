@@ -25,7 +25,7 @@ export default function TeachForm() {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch('http://localhost:5000/classes', {
+      const response = await fetch('http://localhost:5000/reqteachers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -73,7 +73,7 @@ export default function TeachForm() {
       </div>
 
       <h2 className="text-3xl font-extrabold text-center text-gray-800 mb-6">
-        Create Your Class
+        Create Teacher Request
       </h2>
 
       <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

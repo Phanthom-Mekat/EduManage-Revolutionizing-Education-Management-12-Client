@@ -61,7 +61,7 @@ const AllClassesAdmin = () => {
               <TableCell>{classItem.title}</TableCell>
               <TableCell>
                 <img
-                  src={classItem.imageUrl || "/placeholder.svg"}
+                  src={classItem.image || "/placeholder.svg"}
                   alt={classItem.title}
                   className="w-10 h-10 rounded"
                 />

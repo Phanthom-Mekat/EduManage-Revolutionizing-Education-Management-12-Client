@@ -1,35 +1,30 @@
-import { useEffect, useState } from "react"
-import { useParams } from "react-router-dom"
+import {  useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import axios from "axios"
 import CreateAssignmentModal from "./CreateAssignmentModal"
+import { useLoaderData } from "react-router-dom"
 
 const ClassDetails = () => {
-  const { id } = useParams()
-  const [classDetails, setClassDetails] = useState(null)
+  const loaderData = useLoaderData()
+  const [classDetails, setClassDetails] = useState(loaderData)
   const [isModalOpen, setIsModalOpen] = useState(false)
-
-  useEffect(() => {
-    fetchClassDetails()
-  }, []) 
-
-  const fetchClassDetails = async () => {
-    try {
-      const response = await axios.get(`http://localhost:5000/classes/${id}`)
-      setClassDetails(response.data)
-    } catch (error) {
-      console.error("Error fetching class details:", error)
-    }
-  }
 
   const handleCreateAssignment = () => {
     setIsModalOpen(true)
   }
 
-  const handleAssignmentCreated = () => {
-    setIsModalOpen(false)
-    fetchClassDetails() // Refresh class details
+  const handleAssignmentCreated = async () => {
+    try {
+      // Refresh class details after creating assignment
+      const response = await axios.get(
+        `http://localhost:5000/classes/${classDetails._id}`
+      )
+      setClassDetails(response.data)
+      setIsModalOpen(false)
+    } catch (error) {
+      console.error("Error refreshing class details:", error)
+    }
   }
 
   if (!classDetails) return <div>Loading...</div>
@@ -62,11 +57,10 @@ const ClassDetails = () => {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onAssignmentCreated={handleAssignmentCreated}
-        classId={id}
+        classId={classDetails._id}  // Use correct class ID from loader data
       />
     </div>
   )
 }
 
 export default ClassDetails
-

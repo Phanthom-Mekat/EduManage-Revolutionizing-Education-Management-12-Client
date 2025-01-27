@@ -12,7 +12,7 @@ const TeacherRequest = () => {
 
   const fetchTeacherRequests = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/classes")
+      const response = await axios.get("http://localhost:5000/reqteachers")
       setTeacherRequests(response.data.classes)
     } catch (error) {
       console.error("Error fetching teacher requests:", error)
@@ -21,7 +21,7 @@ const TeacherRequest = () => {
 
   const handleApprove = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/classes/${id}/approve`)
+      await axios.put(`http://localhost:5000/reqteachers/${id}/approve`)
       fetchTeacherRequests()
     } catch (error) {
       console.error("Error approving request:", error)
@@ -30,7 +30,7 @@ const TeacherRequest = () => {
 
   const handleReject = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/classes/${id}/reject`)
+      await axios.put(`http://localhost:5000/reqteachers/${id}/reject`)
       fetchTeacherRequests()
     } catch (error) {
       console.error("Error rejecting request:", error)

@@ -18,8 +18,10 @@ import AdminProfile from "@/components/admin/AdminProfile";
 import TeacherDashBoardLayout from "@/pages/Dashboard/TeacherDashBoardLayout";
 import AddClass from "@/components/teacher/AddClass";
 import MyClasses from "@/components/teacher/Myclasses";
-import ClassDetails from "@/components/teacher/ClassDetails";
 import TeacherProfile from "@/components/teacher/TeacherProfile";
+import ClassDetails from "@/components/teacher/ClassDetails";
+import ClassDetailsEnroll from "@/pages/class/ClassDetailsEnroll";
+import PaymentPage from "@/pages/class/PaymentPage";
 
 const router = createBrowserRouter([
     {
@@ -33,7 +35,16 @@ const router = createBrowserRouter([
             {
                 path: '/all-classes',
                 element: <AllClasses/>,
-            },{
+            },
+            {
+                path: '/all-classes/:id',
+                element: <ClassDetailsEnroll/>
+            },
+            {
+                path: '/payment/:id',
+                element: <PaymentPage/>
+            },
+            {
                 path: '/teach',
                 element: <TeachForm/>
             }
@@ -102,7 +113,8 @@ const router = createBrowserRouter([
         },
         {
             path:'my-classes/:id',
-            element:<ClassDetails/>
+            element:<ClassDetails/>,
+            loader:({params})=>fetch(`http://localhost:5000/classes/${params.id}`)
         },
         {
             path:'profile',

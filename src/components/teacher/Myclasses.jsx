@@ -16,7 +16,7 @@ const MyClasses = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/classes?instructorEmail=${user.email}`)
+      const response = await axios.get(`http://localhost:5000/classes?instructorEmail=${user?.email}`)
       setClasses(response.data.classes)
     } catch (error) {
       console.error("Error fetching classes:", error)
@@ -40,7 +40,7 @@ const MyClasses = () => {
   }
 
   const handleSeeDetails = (id) => {
-    navigate(`/dashboard/my-class/${id}`)
+    navigate(`/teacher/my-classes/${id}`)
   }
 
   return (
