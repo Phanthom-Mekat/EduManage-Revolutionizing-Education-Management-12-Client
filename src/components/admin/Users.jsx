@@ -68,7 +68,7 @@ const Users = () => {
               <TableCell>{user.email}</TableCell>
               <TableCell>
                 <img
-                  src={user.photo || "/placeholder.svg"}
+                  src={user.photo?.split("?")[0] || "/placeholder.svg"}  
                   alt={user.displayName}
                   className="w-10 h-10 rounded-full"
                 />

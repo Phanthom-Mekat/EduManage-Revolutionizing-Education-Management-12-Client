@@ -4,15 +4,20 @@ import axios from "axios"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AuthContext } from "@/provider/AuthProvider"
 
 const PaymentPage = () => {
   const [classDetails, setClassDetails] = useState(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState("")
   const [paymentInfo, setPaymentInfo] = useState({
     cardNumber: "",
     expiryDate: "",
-    cvv: "",
+    cvv: ""
   })
+  const [validationErrors, setValidationErrors] = useState({})
+  
   const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useContext(AuthContext)
@@ -23,48 +28,95 @@ const PaymentPage = () => {
         const response = await axios.get(`http://localhost:5000/classes/${id}`)
         setClassDetails(response.data)
       } catch (error) {
-        console.error("Error fetching class details:", error)
+        setError("Failed to load class details. Please try again.")
       }
     }
-
     fetchClassDetails()
   }, [id])
 
+  const validateForm = () => {
+    const errors = {}
+    if (!/^\d{16}$/.test(paymentInfo.cardNumber)) {
+      errors.cardNumber = "Card number must be 16 digits"
+    }
+    if (!/^\d{2}\/\d{2}$/.test(paymentInfo.expiryDate)) {
+      errors.expiryDate = "Expiry date must be in MM/YY format"
+    }
+    if (!/^\d{3}$/.test(paymentInfo.cvv)) {
+      errors.cvv = "CVV must be 3 digits"
+    }
+    setValidationErrors(errors)
+    return Object.keys(errors).length === 0
+  }
+
   const handleInputChange = (e) => {
-    setPaymentInfo({ ...paymentInfo, [e.target.name]: e.target.value })
+    const { name, value } = e.target
+    let formattedValue = value
+
+    if (name === "expiryDate" && value.length === 2 && !value.includes("/")) {
+      formattedValue = value + "/"
+    }
+
+    setPaymentInfo(prev => ({
+      ...prev,
+      [name]: formattedValue
+    }))
+    
+    // Clear validation error when user starts typing
+    if (validationErrors[name]) {
+      setValidationErrors(prev => ({ ...prev, [name]: "" }))
+    }
   }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    setError("")
+    
+    if (!validateForm()) return
+
+    setLoading(true)
     try {
-      // In a real application, you would integrate with a payment gateway here
-      const paymentResponse = await axios.post("http://localhost:5000/process-payment", {
+  
+      const paymentResponse = await axios.post("http://localhost:5000/api/payments", {
         classId: id,
-        userId: user.uid,
-        amount: classDetails.price,
-        ...paymentInfo,
-      })
+        userId: user?.uid,
+        amount: classDetails?.price,
+        ...paymentInfo
+      });
 
       if (paymentResponse.data.success) {
-        // Enroll the user in the class
-        await axios.post("http://localhost:5000/enroll", {
-          classId: id,
-          userId: user.uid,
-        })
-
-        navigate("/dashboard/my-enroll-classes")
+        try {
+          await axios.post("http://localhost:5000/enroll", {
+            classId: id,
+            userId: user?.uid
+          });
+          navigate("/dashboard/my-enroll-class");
+        } catch (enrollError) {
+          setError("Payment successful but enrollment failed. Please contact support.");
+          console.error("Enrollment error:", enrollError);
+        }
       }
     } catch (error) {
-      console.error("Error processing payment:", error)
-      alert("Payment failed. Please try again.")
+      const errorMessage = error.response?.data?.message || "Payment failed. Please try again.";
+      setError(errorMessage);
+      console.error("Payment error:", error.response?.data);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
 
-  if (!classDetails) return <div>Loading...</div>
+  if (!classDetails) return <div className="text-center p-8">Loading...</div>
 
   return (
     <div className="container mx-auto px-4 py-8">
       <h2 className="text-3xl font-bold mb-6">Payment for {classDetails.title}</h2>
+      
+      {error && (
+        <Alert variant="destructive" className="mb-6">
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
       <div className="max-w-md mx-auto">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
@@ -75,9 +127,16 @@ const PaymentPage = () => {
               name="cardNumber"
               value={paymentInfo.cardNumber}
               onChange={handleInputChange}
+              maxLength={16}
+              placeholder="1234 5678 9012 3456"
+              className={validationErrors.cardNumber ? "border-red-500" : ""}
               required
             />
+            {validationErrors.cardNumber && (
+              <p className="text-red-500 text-sm mt-1">{validationErrors.cardNumber}</p>
+            )}
           </div>
+
           <div>
             <Label htmlFor="expiryDate">Expiry Date</Label>
             <Input
@@ -86,15 +145,40 @@ const PaymentPage = () => {
               name="expiryDate"
               value={paymentInfo.expiryDate}
               onChange={handleInputChange}
+              maxLength={5}
+              placeholder="MM/YY"
+              className={validationErrors.expiryDate ? "border-red-500" : ""}
               required
             />
+            {validationErrors.expiryDate && (
+              <p className="text-red-500 text-sm mt-1">{validationErrors.expiryDate}</p>
+            )}
           </div>
+
           <div>
             <Label htmlFor="cvv">CVV</Label>
-            <Input type="text" id="cvv" name="cvv" value={paymentInfo.cvv} onChange={handleInputChange} required />
+            <Input
+              type="text"
+              id="cvv"
+              name="cvv"
+              value={paymentInfo.cvv}
+              onChange={handleInputChange}
+              maxLength={3}
+              placeholder="123"
+              className={validationErrors.cvv ? "border-red-500" : ""}
+              required
+            />
+            {validationErrors.cvv && (
+              <p className="text-red-500 text-sm mt-1">{validationErrors.cvv}</p>
+            )}
           </div>
-          <Button type="submit" className="w-full">
-            Pay ${classDetails.price}
+
+          <Button 
+            type="submit" 
+            className="w-full"
+            disabled={loading}
+          >
+            {loading ? "Processing..." : `Pay $${classDetails.price}`}
           </Button>
         </form>
       </div>
@@ -103,4 +187,3 @@ const PaymentPage = () => {
 }
 
 export default PaymentPage
-
