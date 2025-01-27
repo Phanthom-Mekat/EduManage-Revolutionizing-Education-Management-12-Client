@@ -62,8 +62,8 @@ const Register = () => {
                         navigate(location?.state ? location.state : "/");
                         toast.success("Registered successfully.");
 
-                        const newUser = { name, email, photo }
-                        fetch('https://batcht-10-assignment-11-server.vercel.app/users', {
+                        const newUser = { name, email, photo,role: 'student' }
+                        fetch('http://localhost:5000/users', {
                             method: "POST",
                             headers: {
                                 "content-type": "application/json"
@@ -93,6 +93,20 @@ const Register = () => {
                 setUser(user);
                 navigate(location?.state ? location.state : "/");
                 toast.success("Signed in successfully with Google!");
+                fetch('http://localhost:5000/users', {
+                    method: "POST",
+                    headers: {
+                        "content-type": "application/json"
+                    },
+                    body: JSON.stringify({ name: user.displayName, email: user.email, photo: user.photoURL,role: 'student' })
+                })
+                    .then(res => res.json())
+                    .then(data => {
+                        // console.log(data);
+                        if (data.insertedId) {
+                            toast.success("Signed in successfully.");
+                        }
+                    })
             })
             .catch((err) => {
                 console.log(err);

@@ -10,6 +10,11 @@ import DashboardLayout from "@/pages/Dashboard/StudentDashboard";
 import MyEnrollClass from "@/components/studentdashboard/MyEnrollClass";
 import MyEnrollClassDetails from "@/components/studentdashboard/MyEnrollClassDetails";
 import MyProfile from "@/components/studentdashboard/MyProfile";
+import AdminDashboardLayout from "@/pages/Dashboard/AdminDashBoardLayout";
+import TeacherRequest from "@/components/admin/TeacherRequest";
+import Users from "@/components/admin/Users";
+import AllClassesAdmin from "@/components/admin/AllClassesAdmin";
+import AdminProfile from "@/components/admin/AdminProfile";
 
 const router = createBrowserRouter([
     {
@@ -58,6 +63,25 @@ const router = createBrowserRouter([
             {
                 path:'profile',
                 element:<MyProfile/>
+            }
+        ]
+    },{
+        path: 'admin',
+        element: <AdminDashboardLayout/>,
+        children: [
+            {
+                path: 'teacher-request',
+                element: <TeacherRequest/>
+            },
+            {
+                path: 'users',
+                element: <Users/>
+            },{
+                path:'all-classes',
+                element:<AllClassesAdmin/>
+            },{
+                path:'profile',
+                element:<AdminProfile   />
             }
         ]
     },
