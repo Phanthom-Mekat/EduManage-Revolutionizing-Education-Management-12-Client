@@ -30,7 +30,7 @@ const AddClass = () => {
         status: "pending",
       }
       await axios.post("http://localhost:5000/classes", classData)
-      navigate("/dashboard/my-classes")
+      navigate("/teacher/my-classes")
     } catch (error) {
       console.error("Error adding class:", error)
     }
