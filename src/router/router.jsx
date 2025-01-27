@@ -15,6 +15,11 @@ import TeacherRequest from "@/components/admin/TeacherRequest";
 import Users from "@/components/admin/Users";
 import AllClassesAdmin from "@/components/admin/AllClassesAdmin";
 import AdminProfile from "@/components/admin/AdminProfile";
+import TeacherDashBoardLayout from "@/pages/Dashboard/TeacherDashBoardLayout";
+import AddClass from "@/components/teacher/AddClass";
+import MyClasses from "@/components/teacher/Myclasses";
+import ClassDetails from "@/components/teacher/ClassDetails";
+import TeacherProfile from "@/components/teacher/TeacherProfile";
 
 const router = createBrowserRouter([
     {
@@ -84,6 +89,27 @@ const router = createBrowserRouter([
                 element:<AdminProfile   />
             }
         ]
+    },{
+        path:'teacher',
+        element:<TeacherDashBoardLayout/>,
+        children:[{
+            path:'addclass',
+            element:<AddClass/>
+        },
+        {
+            path:'my-classes',
+            element:<MyClasses/>
+        },
+        {
+            path:'my-classes/:id',
+            element:<ClassDetails/>
+        },
+        {
+            path:'profile',
+            element:<TeacherProfile/>
+        }
+    
+    ]
     },
     {
         path: '/about',
