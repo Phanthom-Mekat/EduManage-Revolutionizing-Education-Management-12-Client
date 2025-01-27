@@ -27,6 +27,7 @@ const AddClass = () => {
         ...formData,
         instructorName: user?.displayName,
         instructorEmail: user?.email,
+        instructorImage: user?.photoURL,
         status: "pending",
       }
       await axios.post("http://localhost:5000/classes", classData)

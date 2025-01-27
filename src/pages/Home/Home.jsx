@@ -1,3 +1,4 @@
+import PopularClassesSlider from "@/components/Home/PopularClassesSlider";
 import Banner from "../../components/Home/Banner";
 import PartnersSection from "../../components/Home/PartnersSection";
 
@@ -6,6 +7,7 @@ const Home = () => {
         <div>
             <Banner/>
             <PartnersSection/>
+            <PopularClassesSlider/>
         </div>
     );
 };

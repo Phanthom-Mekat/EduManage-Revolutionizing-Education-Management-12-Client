@@ -17,11 +17,12 @@ const Navbar = () => {
                 .then(data => {
                     if (data.length > 0) {
                         setUserRole(data[0].role);
+                        
                     }
                 });
         }
     }, [user]);
-
+    console.log(userRole);
     const handleLogout = () => {
         logOut()
             .then(() => { 
@@ -33,11 +34,11 @@ const Navbar = () => {
     const getDashboardLink = () => {
         switch(userRole) {
             case 'admin':
-                return '/admin/teacher-request';
+                return '/admin';
             case 'teacher':
-                return '/teacher/my-classes';
+                return '/teacher';
             default:
-                return '/dashboard/my-enroll-class';
+                return '/dashboard';
         }
     };
 
