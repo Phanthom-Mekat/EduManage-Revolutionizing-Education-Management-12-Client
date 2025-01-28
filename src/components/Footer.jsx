@@ -13,7 +13,7 @@ import {
     const currentYear = new Date().getFullYear();
   
     return (
-      <footer className="bg-white dark:bg-gray-800 text-black dark:text-white">
+      <footer className="bg-white mt-9 dark:bg-gray-800 text-black dark:text-white">
         {/* Main Footer Content */}
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 p-10">
