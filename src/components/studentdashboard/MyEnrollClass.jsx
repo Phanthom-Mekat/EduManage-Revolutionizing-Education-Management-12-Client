@@ -15,10 +15,10 @@ const MyEnrollClass = () => {
     const fetchEnrolledClasses = async () => {
       try {
         // Fetch user from API
-        const res = await fetch('http://localhost:5000/users');
+        const res = await fetch('https://edumanagebackend.vercel.app/users');
         const users = await res.json();
         const userId = users.find((u) => u.email === user?.email)?.uid;
-        const response = await fetch(`http://localhost:5000/enrolled-classes/${userId}`);
+        const response = await fetch(`https://edumanagebackend.vercel.app/enrolled-classes/${userId}`);
         console.log(res)
         if (!response.ok) {
           throw new Error('Failed to fetch enrolled classes');

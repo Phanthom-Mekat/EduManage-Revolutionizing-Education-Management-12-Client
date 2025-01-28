@@ -12,7 +12,7 @@ const Navbar = () => {
 
     useEffect(() => {
         if (user?.email) {
-            fetch(`http://localhost:5000/users?email=${user.email}`)
+            fetch(`https://edumanagebackend.vercel.app/users?email=${user.email}`)
                 .then(res => res.json())
                 .then(data => {
                     if (data.length > 0) {
@@ -22,7 +22,7 @@ const Navbar = () => {
                 });
         }
     }, [user]);
-    console.log(userRole);
+
     const handleLogout = () => {
         logOut()
             .then(() => { 

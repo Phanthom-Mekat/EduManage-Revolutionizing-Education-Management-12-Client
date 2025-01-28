@@ -16,7 +16,7 @@ const TeacherRequest = () => {
 
   const fetchTeacherRequests = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/reqteachers");
+      const response = await axios.get("https://edumanagebackend.vercel.app/reqteachers");
       setTeacherRequests(response.data.classes);
     } catch (error) {
       console.error("Error fetching teacher requests:", error);
@@ -33,7 +33,7 @@ const TeacherRequest = () => {
   
       // Step 1: Approve the teacher request
       const approveResponse = await axios.put(
-        `http://localhost:5000/reqteachers/${request._id}/approve`
+        `https://edumanagebackend.vercel.app/reqteachers/${request._id}/approve`
       );
       console.log("Approval response:", approveResponse.data);
   
@@ -50,7 +50,7 @@ const TeacherRequest = () => {
   const handleReject = async (id) => {
     setProcessing(true);
     try {
-      await axios.put(`http://localhost:5000/reqteachers/${id}/reject`);
+      await axios.put(`https://edumanagebackend.vercel.app/reqteachers/${id}/reject`);
       toast.success("Teacher request rejected");
       fetchTeacherRequests();
     } catch (error) {

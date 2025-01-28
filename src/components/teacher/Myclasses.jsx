@@ -16,7 +16,7 @@ const MyClasses = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/classes?instructorEmail=${user?.email}`)
+      const response = await axios.get(`https://edumanagebackend.vercel.app/classes?instructorEmail=${user?.email}`)
       setClasses(response.data.classes)
     } catch (error) {
       console.error("Error fetching classes:", error)
@@ -31,7 +31,7 @@ const MyClasses = () => {
   const handleDelete = async (id) => {
     if (window.confirm("Are you sure you want to delete this class?")) {
       try {
-        await axios.delete(`http://localhost:5000/classes/${id}`)
+        await axios.delete(`https://edumanagebackend.vercel.app/classes/${id}`)
         fetchClasses()
       } catch (error) {
         console.error("Error deleting class:", error)

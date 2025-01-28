@@ -8,7 +8,7 @@ const AllClasses = () => {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/classes?status=approved")
+        const response = await axios.get("https://edumanagebackend.vercel.app/classes?status=approved")
         setClasses(response.data.classes)
       } catch (error) {
         console.error("Error fetching classes:", error)

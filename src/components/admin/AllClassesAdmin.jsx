@@ -12,7 +12,7 @@ const AllClassesAdmin = () => {
 
   const fetchClasses = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/all-classes")
+      const response = await axios.get("https://edumanagebackend.vercel.app/all-classes")
       setClasses(response.data)
     } catch (error) {
       console.error("Error fetching classes:", error)
@@ -21,7 +21,7 @@ const AllClassesAdmin = () => {
 
   const handleApprove = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/classes/${id}/approve`)
+      await axios.put(`https://edumanagebackend.vercel.app/classes/${id}/approve`)
       fetchClasses()
     } catch (error) {
       console.error("Error approving class:", error)
@@ -30,7 +30,7 @@ const AllClassesAdmin = () => {
 
   const handleReject = async (id) => {
     try {
-      await axios.put(`http://localhost:5000/classes/${id}/reject`)
+      await axios.put(`https://edumanagebackend.vercel.app/classes/${id}/reject`)
       fetchClasses()
     } catch (error) {
       console.error("Error rejecting class:", error)

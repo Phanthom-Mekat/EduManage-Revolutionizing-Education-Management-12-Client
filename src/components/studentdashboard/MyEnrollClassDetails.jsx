@@ -26,8 +26,8 @@ const MyEnrollClassDetails = () => {
     const fetchClassDetails = async () => {
       try {
         const [classResponse, assignmentsResponse] = await Promise.all([
-          fetch(`http://localhost:5000/classes/${id}`),
-          fetch(`http://localhost:5000/classes/${id}/assignments`)
+          fetch(`https://edumanagebackend.vercel.app/classes/${id}`),
+          fetch(`https://edumanagebackend.vercel.app/classes/${id}/assignments`)
         ]);
 
         if (!classResponse.ok || !assignmentsResponse.ok) {
@@ -58,7 +58,7 @@ const MyEnrollClassDetails = () => {
     }
 
     setSubmitting(true);
-    const res = await fetch('http://localhost:5000/users');
+    const res = await fetch('https://edumanagebackend.vercel.app/users');
     const users = await res.json();
     const userId = users.find((u) => u.email === user?.email)?.uid;
     const formData = new FormData();
@@ -68,7 +68,7 @@ const MyEnrollClassDetails = () => {
     formData.append('userId', userId); 
 
     try {
-      const response = await fetch(`http://localhost:5000/assignments/${assignmentId}/submit`, {
+      const response = await fetch(`https://edumanagebackend.vercel.app/assignments/${assignmentId}/submit`, {
         method: 'POST',
         body: formData
       });
@@ -91,10 +91,10 @@ const MyEnrollClassDetails = () => {
 
   const handleEvaluationSubmit = async () => {
     try {
-      const res = await fetch('http://localhost:5000/users');
+      const res = await fetch('https://edumanagebackend.vercel.app/users');
       const users = await res.json();
       const userId = users.find((u) => u.email === user?.email)?.uid;
-      const response = await fetch(`http://localhost:5000/classes/${id}/evaluate`, {
+      const response = await fetch(`https://edumanagebackend.vercel.app/classes/${id}/evaluate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
