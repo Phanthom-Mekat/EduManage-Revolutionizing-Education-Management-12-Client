@@ -30,7 +30,7 @@ const AddClass = () => {
         instructorImage: user?.photoURL,
         status: "pending",
       }
-      await axios.post("http://localhost:5000/classes", classData)
+      await axios.post("https://edumanagebackend.vercel.app/classes", classData)
       navigate("/teacher/my-classes")
     } catch (error) {
       console.error("Error adding class:", error)

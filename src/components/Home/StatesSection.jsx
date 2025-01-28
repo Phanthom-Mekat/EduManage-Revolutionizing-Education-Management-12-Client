@@ -32,8 +32,8 @@ const StatsSection = () => {
     const fetchData = async () => {
       try {
         const [usersResponse, classesResponse] = await Promise.all([
-          fetch('http://localhost:5000/users'),
-          fetch('http://localhost:5000/classes')
+          fetch('https://edumanagebackend.vercel.app/users'),
+          fetch('https://edumanagebackend.vercel.app/classes')
         ]);
 
         const usersData = await usersResponse.json();

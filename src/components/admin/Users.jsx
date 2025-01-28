@@ -21,7 +21,7 @@ const Users = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/users");
+      const response = await axios.get("https://edumanagebackend.vercel.app/users");
       setUsers(response.data);
     } catch (error) {
       console.error("Error fetching users:", error);
@@ -30,7 +30,7 @@ const Users = () => {
 
   const handleUpdateRole = async (id, role) => {
     try {
-      await axios.put(`http://localhost:5000/users/${id}/update-role`, { role });
+      await axios.put(`https://edumanagebackend.vercel.app/users/${id}/update-role`, { role });
       fetchUsers(); // Refresh the user list
     } catch (error) {
       console.error("Error updating user role:", error);
@@ -39,7 +39,7 @@ const Users = () => {
 
   const handleSearch = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/users/search?term=${searchTerm}`);
+      const response = await axios.get(`https://edumanagebackend.vercel.app/users/search?term=${searchTerm}`);
       setUsers(response.data);
     } catch (error) {
       console.error("Error searching users:", error);

@@ -20,7 +20,7 @@ const CreateAssignmentModal = ({ isOpen, onClose, onAssignmentCreated, classId }
   const handleSubmit = async (e) => {
     e.preventDefault()
     try {
-      await axios.post(`http://localhost:5000/classes/${classId}/assignments`, formData)
+      await axios.post(`https://edumanagebackend.vercel.app/classes/${classId}/assignments`, formData)
       onAssignmentCreated()
     } catch (error) {
       console.error("Error creating assignment:", error)

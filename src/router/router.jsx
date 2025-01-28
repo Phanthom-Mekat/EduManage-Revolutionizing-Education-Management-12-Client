@@ -116,7 +116,7 @@ const router = createBrowserRouter([
         {
             path:'my-classes/:id',
             element:<PrivateRouter><ClassDetails/></PrivateRouter>  ,
-            loader:({params})=>fetch(`http://localhost:5000/classes/${params.id}`)
+            loader:({params})=>fetch(`https://edumanagebackend.vercel.app/classes/${params.id}`)
         },
         {
             path:'profile',

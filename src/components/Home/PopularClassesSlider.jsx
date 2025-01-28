@@ -14,7 +14,7 @@ const PopularClasses = () => {
   useEffect(() => {
     const fetchClasses = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/classes?status=approved");
+        const response = await axios.get("https://edumanagebackend.vercel.app/classes?status=approved");
         const sortedClasses = response.data.classes
           .sort((a, b) => b.totalEnrollment - a.totalEnrollment)
           .slice(0, 6);

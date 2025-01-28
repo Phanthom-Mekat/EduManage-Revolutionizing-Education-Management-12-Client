@@ -18,7 +18,7 @@ const ClassDetails = () => {
     try {
       // Refresh class details after creating assignment
       const response = await axios.get(
-        `http://localhost:5000/classes/${classDetails._id}`
+        `https://edumanagebackend.vercel.app/classes/${classDetails._id}`
       )
       setClassDetails(response.data)
       setIsModalOpen(false)

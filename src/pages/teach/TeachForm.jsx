@@ -25,7 +25,7 @@ export default function TeachForm() {
 
   const onSubmit = async (data) => {
     try {
-      const response = await fetch('http://localhost:5000/reqteachers', {
+      const response = await fetch('https://edumanagebackend.vercel.app/reqteachers', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

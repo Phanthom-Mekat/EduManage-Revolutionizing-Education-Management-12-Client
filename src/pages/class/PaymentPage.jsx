@@ -25,7 +25,7 @@ const PaymentPage = () => {
   useEffect(() => {
     const fetchClassDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/classes/${id}`)
+        const response = await axios.get(`https://edumanagebackend.vercel.app/classes/${id}`)
         setClassDetails(response.data)
       } catch (error) {
         setError("Failed to load class details. Please try again.")
@@ -77,7 +77,7 @@ const PaymentPage = () => {
     setLoading(true)
     try {
   
-      const paymentResponse = await axios.post("http://localhost:5000/api/payments", {
+      const paymentResponse = await axios.post("https://edumanagebackend.vercel.app/api/payments", {
         classId: id,
         userId: user?.uid,
         amount: classDetails?.price,
@@ -86,7 +86,7 @@ const PaymentPage = () => {
 
       if (paymentResponse.data.success) {
         try {
-          await axios.post("http://localhost:5000/enroll", {
+          await axios.post("https://edumanagebackend.vercel.app/enroll", {
             classId: id,
             userId: user?.uid
           });

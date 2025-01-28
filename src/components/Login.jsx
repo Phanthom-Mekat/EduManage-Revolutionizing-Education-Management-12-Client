@@ -55,15 +55,42 @@ const Login = () => {
 
     const handleGoogleSignIn = () => {
         signInWithGoogle()
-            .then((result) => {
-                const user = result.user;
-                setUser(user);
-                toast.success('Signed in successfully with Google!');
-                navigate(location?.state ? location.state : "/");
+            .then(async (result) => {
+                const loggedUser = result.user;
+                
+                // Save user data to database
+                const saveUser = {
+                    name: loggedUser.displayName,
+                    email: loggedUser.email,
+                    photo: loggedUser.photoURL,
+                    role: "student",
+                    uid: loggedUser.uid
+                };
+    
+                try {
+                    const response = await fetch('https://edumanagebackend.vercel.app/users', {
+                        method: 'POST',
+                        headers: {
+                            'content-type': 'application/json'
+                        },
+                        body: JSON.stringify(saveUser)
+                    });
+    
+                    if (response.ok) {
+                        setUser(loggedUser);
+                        toast.success('Signed in successfully with Google!');
+                        navigate(location?.state ? location.state : "/");
+                    } else {
+                        toast.error('Failed to save user data');
+                    }
+                } catch (error) {
+                    toast.error('Error saving user data');
+                    console.error(error);
+                }
             })
-            .catch((err) => {
-                // console.log(err);
-                toast.error('This is an error!',err);
+            .catch((error) => {
+                toast.error('Google sign-in failed');
+                console.error(error);
             });
     };
 

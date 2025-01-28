@@ -11,7 +11,7 @@ const ClassDetailsEnroll = () => {
   useEffect(() => {
     const fetchClassDetails = async () => {
       try {
-        const response = await axios.get(`http://localhost:5000/classes/${id}`)
+        const response = await axios.get(`https://edumanagebackend.vercel.app/classes/${id}`)
         setClassDetails(response.data)
       } catch (error) {
         console.error("Error fetching class details:", error)
