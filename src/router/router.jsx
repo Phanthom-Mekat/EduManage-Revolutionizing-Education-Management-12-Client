@@ -22,6 +22,8 @@ import TeacherProfile from "@/components/teacher/TeacherProfile";
 import ClassDetails from "@/components/teacher/ClassDetails";
 import ClassDetailsEnroll from "@/pages/class/ClassDetailsEnroll";
 import PaymentPage from "@/pages/class/PaymentPage";
+import ErrorPage from "@/pages/ErrorPage";
+import PrivateRouter from "./PrivateRouter";
 
 const router = createBrowserRouter([
     {
@@ -38,15 +40,15 @@ const router = createBrowserRouter([
             },
             {
                 path: '/all-classes/:id',
-                element: <ClassDetailsEnroll/>
+                element: <PrivateRouter><ClassDetailsEnroll/></PrivateRouter>
             },
             {
                 path: '/payment/:id',
-                element: <PaymentPage/>
+                element: <PrivateRouter><PaymentPage/></PrivateRouter>
             },
             {
                 path: '/teach',
-                element: <TeachForm/>
+                element: <PrivateRouter><TeachForm/></PrivateRouter>
             }
 
         ]
@@ -67,65 +69,65 @@ const router = createBrowserRouter([
         ]
     },{
         path:'dashboard',
-        element:<DashboardLayout/>,
+        element:<PrivateRouter><DashboardLayout/></PrivateRouter> ,
         children:[
             {
                 path:'my-enroll-class',
-                element:<MyEnrollClass/>
+                element:<PrivateRouter><MyEnrollClass/></PrivateRouter>
             },{
                 path:'myenroll-class/:id',
-                element:<MyEnrollClassDetails/>
+                element:<PrivateRouter><MyEnrollClassDetails/></PrivateRouter>
             },
             {
                 path:'profile',
-                element:<MyProfile/>
+                element:<PrivateRouter><MyProfile/></PrivateRouter>
             }
         ]
     },{
         path: 'admin',
-        element: <AdminDashboardLayout/>,
+        element: <PrivateRouter><AdminDashboardLayout/></PrivateRouter>,
         children: [
             {
                 path: 'teacher-request',
-                element: <TeacherRequest/>
+                element: <PrivateRouter><TeacherRequest/></PrivateRouter>
             },
             {
                 path: 'users',
-                element: <Users/>
+                element: <PrivateRouter><Users/></PrivateRouter>
             },{
                 path:'all-classes',
-                element:<AllClassesAdmin/>
+                element:<PrivateRouter><AllClassesAdmin/></PrivateRouter>
             },{
                 path:'profile',
-                element:<AdminProfile   />
+                element:<PrivateRouter><AdminProfile/></PrivateRouter>
             }
         ]
     },{
         path:'teacher',
-        element:<TeacherDashBoardLayout/>,
+        element:  <PrivateRouter><TeacherDashBoardLayout/></PrivateRouter> ,
         children:[{
             path:'addclass',
-            element:<AddClass/>
+            element:<PrivateRouter><AddClass/></PrivateRouter>
         },
         {
             path:'my-classes',
-            element:<MyClasses/>
+            element:<PrivateRouter><MyClasses/></PrivateRouter>
         },
         {
             path:'my-classes/:id',
-            element:<ClassDetails/>,
+            element:<PrivateRouter><ClassDetails/></PrivateRouter>  ,
             loader:({params})=>fetch(`http://localhost:5000/classes/${params.id}`)
         },
         {
             path:'profile',
-            element:<TeacherProfile/>
+            element:<PrivateRouter><TeacherProfile/></PrivateRouter>
         }
     
     ]
     },
     {
-        path: '/about',
-        element: <h1>About</h1>
+        path: '*',
+        element: <ErrorPage/>
     }
 ])
 
