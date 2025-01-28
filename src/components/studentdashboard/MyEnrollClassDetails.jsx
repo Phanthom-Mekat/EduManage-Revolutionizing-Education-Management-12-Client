@@ -91,13 +91,18 @@ const MyEnrollClassDetails = () => {
 
   const handleEvaluationSubmit = async () => {
     try {
+      const res = await fetch('http://localhost:5000/users');
+      const users = await res.json();
+      const userId = users.find((u) => u.email === user?.email)?.uid;
       const response = await fetch(`http://localhost:5000/classes/${id}/evaluate`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          userId: localStorage.getItem('userId'), // Adjust based on your auth
+          userId: userId,
+          name: user?.displayName,
+          photo:user?.photoURL,
           rating: evaluation.rating,
           description: evaluation.description
         })
