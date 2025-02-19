@@ -8,7 +8,7 @@ import AdditionalSections from "@/components/Home/AdditionalSection";
 
 const Home = () => {
     return (
-        <div>
+        <div className="dark:bg-gray-900" >
             <Banner/>
             <PartnersSection/>
             <PopularClassesSlider/>

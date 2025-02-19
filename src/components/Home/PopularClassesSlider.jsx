@@ -42,7 +42,7 @@ const PopularClasses = () => {
 
   if (loading) {
     return (
-      <div className="container mx-auto py-12">
+      <div className="container mx-auto py-12  ">
         <h2 className="text-3xl font-bold text-center mb-8">Popular Classes</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3].map((i) => (
@@ -54,34 +54,41 @@ const PopularClasses = () => {
   }
 
   return (
-    <div className="container mx-auto py-12">
-      <h2 className="text-3xl font-bold text-center mb-8">
+    <div
+      className="container mx-auto py-12  dark:bg-gray-900 dark:text-white"
+    >
+      <h2 className="text-3xl font-bold text-center mb-8 dark:text-white">
         Popular Classes
-        <span className="block text-lg font-normal text-gray-600 mt-2">
+        <span className="block text-lg font-normal text-gray-600 mt-2 dark:text-gray-300">
           Discover our most enrolled courses
         </span>
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {classes.map((classItem) => (
-          <Card key={classItem._id} className="h-full group hover:shadow-lg transition-all duration-300">
+          <Card
+            key={classItem._id}
+            className="h-full group hover:shadow-lg transition-all duration-300 dark:bg-gray-700 dark:border-gray-600"
+          >
             <div className="relative">
               <img
                 src={classItem.image}
                 alt={classItem.title}
                 className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
               />
-              <Badge className="absolute top-2 right-2 bg-primary/90">
+              <Badge className="absolute top-2 right-2 bg-primary/90 dark:bg-gray-700">
                 {classItem.category}
               </Badge>
             </div>
             <CardContent className="p-6 space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-xl font-semibold line-clamp-1">
+                <h3 className="text-xl font-semibold line-clamp-1 dark:text-white">
                   {classItem.title}
                 </h3>
                 <div className="flex items-center gap-1">
-                  <FiStar className="text-yellow-500" />
-                  <span>{classItem.rating || "4.5"}</span>
+                  <FiStar className="text-yellow-500 dark:text-yellow-300" />
+                  <span className="dark:text-white">
+                    {classItem.rating || "4.5"}
+                  </span>
                 </div>
               </div>
 
@@ -89,14 +96,18 @@ const PopularClasses = () => {
                 <img
                   src={classItem.instructorImage || "/placeholder-avatar.svg"}
                   alt={classItem.instructorName}
-                  className="w-8 h-8 rounded-full"
+                  className="w-8 h-8 rounded-full dark:border-gray-600"
                 />
-                <span className="text-gray-600">{classItem.instructorName}</span>
+                <span className="text-gray-600 dark:text-gray-300">
+                  {classItem.instructorName}
+                </span>
               </div>
 
-              <p className="text-gray-600 line-clamp-2">{classItem.description}</p>
+              <p className="text-gray-600 line-clamp-2 dark:text-gray-300">
+                {classItem.description}
+              </p>
 
-              <div className="flex items-center justify-between text-sm text-gray-500">
+              <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-300">
                 <div className="flex items-center gap-1">
                   <FiUsers />
                   <span>{classItem.totalEnrollment} enrolled</span>
@@ -107,12 +118,12 @@ const PopularClasses = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between pt-4 border-t">
-                <span className="text-2xl font-bold text-primary">
+              <div className="flex items-center justify-between pt-4 border-t dark:border-gray-600">
+                <span className="text-2xl font-bold text-primary dark:text-white">
                   ${classItem.price}
                 </span>
                 <Link to={`/all-classes/${classItem._id}`}>
-                  <Button className="bg-primary hover:bg-primary/90 transition-colors">
+                  <Button className="bg-primary hover:bg-primary/90 transition-colors  dark:bg-primary dark:text-white ">
                     Enroll Now
                   </Button>
                 </Link>

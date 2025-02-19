@@ -74,24 +74,23 @@ const FeedbackSection = () => {
   }
 
   return (
-    <div className="bg-gradient-to-b from-gray-50 to-white py-16 px-4">
+    <div className="bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-black py-16 px-4">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-12">
-          <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+          <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent dark:from-blue-500 dark:to-purple-500">
             What Our Students Say
           </h2>
-          <p className="text-gray-600 text-lg">
+          <p className="text-gray-600 text-lg dark:text-gray-400">
             Feedback from our amazing community of learners
           </p>
-          
           <div className="mt-8 flex flex-col items-center">
             <div className="flex items-center gap-4 mb-4">
               <StarRating rating={averageRating} size={24} />
-              <span className="text-2xl font-bold text-gray-800">
+              <span className="text-2xl font-bold text-gray-800 dark:text-gray-100">
                 {averageRating.toFixed(1)}
               </span>
             </div>
-            <p className="text-gray-500">
+            <p className="text-gray-500 dark:text-gray-400">
               Based on {reviews.length} student reviews
             </p>
           </div>
@@ -103,8 +102,8 @@ const FeedbackSection = () => {
                 onClick={() => setActiveFilter(filter)}
                 className={`px-4 py-2 rounded-full transition-all ${
                   activeFilter === filter
-                    ? "bg-blue-500 text-white"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    ? "bg-blue-500 text-white dark:bg-blue-400"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
                 }`}
               >
                 {filter === "all" ? "All Reviews" : `${filter} Stars`}
@@ -117,7 +116,7 @@ const FeedbackSection = () => {
           {filteredReviews.map((review) => (
             <Card
               key={review._id}
-              className="h-full hover:shadow-lg transition-shadow duration-300"
+              className="h-full hover:shadow-lg transition-shadow duration-300 dark:bg-gray-800 dark:text-white"
             >
               <CardContent className="p-6">
                 <div className="flex items-center gap-4 mb-4">
@@ -126,11 +125,11 @@ const FeedbackSection = () => {
                       <img
                         src={review.photo}
                         alt={review.name || "Anonymous"}
-                        className="rounded-full object-cover w-full h-full ring-2 ring-blue-100"
+                        className="rounded-full object-cover w-full h-full ring-2 ring-blue-100 dark:ring-blue-400"
                       />
                     ) : (
-                      <div className="rounded-full bg-gradient-to-br from-blue-100 to-purple-100 w-full h-full flex items-center justify-center ring-2 ring-blue-100">
-                        <User className="h-6 w-6 text-blue-400" />
+                      <div className="rounded-full bg-gradient-to-br from-blue-100 to-purple-100 w-full h-full flex items-center justify-center ring-2 ring-blue-100 dark:ring-blue-400">
+                        <User className="h-6 w-6 text-blue-400 dark:text-blue-300" />
                       </div>
                     )}
                     <Quote className="absolute -bottom-2 -right-2 bg-gradient-to-br from-blue-500 to-purple-500 text-white rounded-full p-1.5 shadow-lg" size={24} />
@@ -139,7 +138,7 @@ const FeedbackSection = () => {
                     <h3 className="font-semibold text-lg">
                       {review.name || "Anonymous Student"}
                     </h3>
-                    <p className="text-sm text-gray-500">{review.className}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">{review.className}</p>
                   </div>
                 </div>
 
@@ -147,11 +146,11 @@ const FeedbackSection = () => {
                   <StarRating rating={review.rating} />
                 </div>
 
-                <p className="text-gray-600 min-h-[4.5rem] italic">
+                <p className="text-gray-600 dark:text-gray-300 min-h-[4.5rem] italic">
                   "{review.description || "No comment provided"}"
                 </p>
 
-                <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between text-sm text-gray-500">
+                <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
                   <div className="flex items-center gap-1.5">
                     <Calendar size={14} />
                     <span>{new Date(review.submittedAt).toLocaleDateString()}</span>
@@ -169,5 +168,4 @@ const FeedbackSection = () => {
     </div>
   );
 };
-
 export default FeedbackSection;
