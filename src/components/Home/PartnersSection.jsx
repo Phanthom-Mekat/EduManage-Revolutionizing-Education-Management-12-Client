@@ -44,13 +44,13 @@ const PartnersSection = () => {
   ];
 
   return (
-    <section className="py-10 bg-gray-50">
+    <section className="py-10 bg-gray-50 dark:bg-gray-900">
       <div className="container mx-auto px-4">
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-800">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 text-gray-800 dark:text-white">
             Our Strategic Partners
           </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <p className="text-gray-600 max-w-2xl mx-auto dark:text-gray-400">
             Collaborating with global leaders to deliver world-class educational experiences and 
             industry-relevant learning opportunities
           </p>
@@ -61,7 +61,7 @@ const PartnersSection = () => {
             <div 
               key={index}
               className={`
-                ${partner.color} 
+                ${partner.color} dark:bg-gray-800
                 rounded-xl p-6 shadow-lg 
                 transform transition-all duration-300
                 ${hoveredPartner === index 
@@ -83,11 +83,11 @@ const PartnersSection = () => {
                       : 'rotate-0 scale-100'}
                   `}
                 />
-                <h3 className="text-xl font-semibold text-gray-800">
+                <h3 className="text-xl font-semibold text-gray-800 dark:text-white">
                   {partner.name}
                 </h3>
               </div>
-              <p className="text-gray-600 text-sm leading-relaxed">
+              <p className="text-gray-600 text-sm leading-relaxed dark:text-gray-400">
                 {partner.description}
               </p>
             </div>
@@ -95,12 +95,12 @@ const PartnersSection = () => {
         </div>
 
         <div className="mt-12 text-center">
-          <div className="inline-flex items-center bg-white px-6 py-3 rounded-full shadow-md">
+          <div className="inline-flex items-center bg-white dark:bg-gray-800 px-6 py-3 rounded-full shadow-md">
             <div className="flex items-center space-x-2">
               <Award className="text-primary h-5 w-5" />
               <Globe className="text-primary h-5 w-5" />
               <Users className="text-primary h-5 w-5" />
-              <span className="text-sm text-gray-500 ml-2">
+              <span className="text-sm text-gray-500 dark:text-gray-400 ml-2">
                 Trusted by educational institutions worldwide
               </span>
             </div>
