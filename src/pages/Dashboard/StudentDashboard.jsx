@@ -90,7 +90,7 @@ const DashboardLayout = () => {
 
   const renderDashboardContent = () => {
     if (loading) {
-      return <div className="flex justify-center items-center h-full">Loading...</div>;
+      return <div className="flex justify-center items-center h-full"><span className="loading text-primary loading-dots loading-xl"></span></div>;
     }
 
     if (error) {
