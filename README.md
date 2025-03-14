@@ -57,6 +57,7 @@ EduManage is a robust and user-friendly platform designed using the MERN stack (
 
 ---
 
+
 ## 🛠️ Tech Stack
 - **Frontend**: React.js, Tailwind CSS, DaisyUI, Framer Motion
 - **Backend**: Node.js, Express.js
