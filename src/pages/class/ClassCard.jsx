@@ -22,7 +22,7 @@ const ClassCard = ({ classItem }) => {
 
   console.log(instructorImage)
   return (
-    <Card className="group hover:shadow-lg transition-shadow duration-300 dark:bg-gray-800 dark:text-white">
+    <Card className="group hover:shadow-lg border-none transition-shadow duration-300 dark:bg-gray-800 dark:text-white">
       <div className="relative">
         <img 
           src={image || "/placeholder.svg"} 

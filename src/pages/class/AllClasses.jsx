@@ -5,14 +5,18 @@ import ClassCard from "./ClassCard"
 const AllClasses = () => {
   const [classes, setClasses] = useState([])
   const [sortOrder, setSortOrder] = useState("default") // default, asc, desc
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     const fetchClasses = async () => {
+      setLoading(true)
       try {
         const response = await axios.get("https://edumanagebackend.vercel.app/classes?status=approved")
         setClasses(response.data.classes)
       } catch (error) {
         console.error("Error fetching classes:", error)
+      } finally {
+        setLoading(false)
       }
     }
 
@@ -44,6 +48,7 @@ const AllClasses = () => {
                 ? "bg-blue-600 text-white"
                 : "bg-gray-200 hover:bg-gray-300"
             }`}
+            disabled={loading}
           >
             Price: Low to High
           </button>
@@ -54,16 +59,24 @@ const AllClasses = () => {
                 ? "bg-blue-600 text-white"
                 : "bg-gray-200 hover:bg-gray-300"
             }`}
+            disabled={loading}
           >
             Price: High to Low
           </button>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {classes.map((classItem) => (
-          <ClassCard key={classItem._id} classItem={classItem} />
-        ))}
-      </div>
+      
+      {loading ? (
+        <div className="flex justify-center items-center h-64">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600"></div>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {classes.map((classItem) => (
+            <ClassCard key={classItem._id} classItem={classItem} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }

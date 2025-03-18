@@ -116,7 +116,7 @@ const FeedbackSection = () => {
           {filteredReviews.map((review) => (
             <Card
               key={review._id}
-              className="h-full hover:shadow-lg transition-shadow duration-300 dark:bg-gray-800 dark:text-white"
+              className="h-full hover:shadow-lg border-none transition-shadow duration-300 dark:bg-gray-800 dark:text-white"
             >
               <CardContent className="p-6">
                 <div className="flex items-center gap-4 mb-4">
