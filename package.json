@@ -24,6 +24,7 @@
     "clsx": "^2.1.1",
     "dotenv": "^16.4.7",
     "firebase": "^11.2.0",
+    "framer-motion": "^12.5.0",
     "hamburger-react": "^2.5.2",
     "jsonwebtoken": "^9.0.2",
     "lottie-react": "^2.4.1",

@@ -29,7 +29,7 @@ const ClassDetailsEnroll = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h2 className="text-3xl font-bold mb-6">{classDetails.title}</h2>
+      <h2 className="text-3xl font-bold mb-6 dark:text-white">{classDetails.title}</h2>
       <img
         src={classDetails.image || "/placeholder.svg"}
         alt={classDetails.title}
@@ -37,16 +37,16 @@ const ClassDetailsEnroll = () => {
       />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <p className="text-xl mb-2">
+          <p className="text-xl mb-2 dark:text-white">
             <strong>Instructor:</strong> {classDetails.instructorName}
           </p>
-          <p className="text-xl mb-2">
+          <p className="text-xl mb-2 dark:text-white ">
             <strong>Price:</strong> ${classDetails.price}
           </p>
-          <p className="text-xl mb-2">
+          <p className="text-xl mb-2 dark:text-white">
             <strong>Total Enrollment:</strong> {classDetails.totalEnrollment}
           </p>
-          <p className="text-lg mb-4">{classDetails.description}</p>
+          <p className="text-lg mb-4 dark:text-white">{classDetails.description}</p>
         </div>
         <div className="flex items-start justify-center">
           <Button onClick={handleEnroll} size="lg">
