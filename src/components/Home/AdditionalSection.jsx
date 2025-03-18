@@ -34,7 +34,7 @@ const SuccessStoriesSection = () => (
             achievement: "Featured on Dribbble Showcase"
           }
         ].map((story, index) => (
-          <Card key={index} className="hover:shadow-lg transition-shadow duration-300 dark:bg-gray-800 dark:text-white">
+          <Card key={index} className="hover:shadow-lg border-none transition-shadow duration-300 dark:bg-gray-800 dark:text-white">
             <CardContent className="p-6">
               <div className="flex items-center gap-4 mb-4">
                 <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 dark:bg-gradient-to-br dark:from-blue-400 dark:to-purple-400 flex items-center justify-center">
@@ -89,7 +89,7 @@ const LearningPathsSection = () => (
             icon: BarChart
           }
         ].map((path, index) => (
-          <Card key={index} className="hover:shadow-xl transition-all duration-300 dark:bg-gray-800 dark:text-white">
+          <Card key={index} className="hover:shadow-xl border-none transition-all duration-300 dark:bg-gray-800 dark:text-white">
             <CardContent className="p-8">
               <div className="flex items-start gap-6">
                 <div className="w-14 h-14 rounded-full bg-blue-50 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
