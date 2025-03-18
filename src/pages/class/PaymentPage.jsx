@@ -108,11 +108,11 @@ const PaymentPage = () => {
   if (!classDetails) return <div className="text-center p-8">Loading...</div>
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h2 className="text-3xl font-bold mb-6">Payment for {classDetails.title}</h2>
+    <div className="container mx-auto px-4 py-8 dark:bg-neutral-900">
+      <h2 className="text-3xl font-bold mb-6 dark:text-white">Payment for {classDetails.title}</h2>
       
       {error && (
-        <Alert variant="destructive" className="mb-6">
+        <Alert variant="destructive" className="mb-6 dark:bg-neutral-800 dark:text-white">
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
@@ -120,7 +120,7 @@ const PaymentPage = () => {
       <div className="max-w-md mx-auto">
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <Label htmlFor="cardNumber">Card Number</Label>
+            <Label htmlFor="cardNumber" className="dark:text-white">Card Number</Label>
             <Input
               type="text"
               id="cardNumber"
@@ -129,16 +129,16 @@ const PaymentPage = () => {
               onChange={handleInputChange}
               maxLength={16}
               placeholder="1234 5678 9012 3456"
-              className={validationErrors.cardNumber ? "border-red-500" : ""}
+              className= {validationErrors.cardNumber ? "border-red-500 dark:border-red-500" : ""}
               required
             />
             {validationErrors.cardNumber && (
-              <p className="text-red-500 text-sm mt-1">{validationErrors.cardNumber}</p>
+              <p className="text-red-500 text-sm mt-1 dark:text-red-500">{validationErrors.cardNumber}</p>
             )}
           </div>
 
           <div>
-            <Label htmlFor="expiryDate">Expiry Date</Label>
+            <Label htmlFor="expiryDate" className="dark:text-white">Expiry Date</Label>
             <Input
               type="text"
               id="expiryDate"
@@ -147,16 +147,16 @@ const PaymentPage = () => {
               onChange={handleInputChange}
               maxLength={5}
               placeholder="MM/YY"
-              className={validationErrors.expiryDate ? "border-red-500" : ""}
+              className={validationErrors.expiryDate ? "border-red-500 dark:border-red-500" : ""}
               required
             />
             {validationErrors.expiryDate && (
-              <p className="text-red-500 text-sm mt-1">{validationErrors.expiryDate}</p>
+              <p className="text-red-500 text-sm mt-1 dark:text-red-500">{validationErrors.expiryDate}</p>
             )}
           </div>
 
           <div>
-            <Label htmlFor="cvv">CVV</Label>
+            <Label htmlFor="cvv" className="dark:text-white">CVV</Label>
             <Input
               type="text"
               id="cvv"
@@ -165,17 +165,17 @@ const PaymentPage = () => {
               onChange={handleInputChange}
               maxLength={3}
               placeholder="123"
-              className={validationErrors.cvv ? "border-red-500" : ""}
+              className={validationErrors.cvv ? "border-red-500 dark:border-red-500" : ""}
               required
             />
             {validationErrors.cvv && (
-              <p className="text-red-500 text-sm mt-1">{validationErrors.cvv}</p>
+              <p className="text-red-500 text-sm mt-1 dark:text-red-500">{validationErrors.cvv}</p>
             )}
           </div>
 
           <Button 
             type="submit" 
-            className="w-full"
+            className="w-full dark:bg-neutral-800 dark:text-white dark:hover:bg-neutral-700"
             disabled={loading}
           >
             {loading ? "Processing..." : `Pay $${classDetails.price}`}
