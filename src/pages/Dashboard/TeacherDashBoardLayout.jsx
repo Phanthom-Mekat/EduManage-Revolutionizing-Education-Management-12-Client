@@ -1,7 +1,7 @@
-import  { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { 
   LayoutDashboard, 
   PlusCircle, 
@@ -13,10 +13,14 @@ import {
   Home,
   Users,
   FileCheck,
-  Star 
+  Star,
+  GraduationCap,
+  Activity
 } from "lucide-react";
 import { AuthContext } from "@/provider/AuthProvider";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { motion, AnimatePresence } from "framer-motion";
+import { ThemeToggle } from "@/components/ui/theme-toggle";
 
 const TeacherDashBoardLayout = () => {
   const { user, logOut } = useContext(AuthContext);
@@ -66,236 +70,470 @@ const TeacherDashBoardLayout = () => {
   }, [user?.email]);
 
   const navItems = [
-    { path: "/teacher", icon: <LayoutDashboard className="mr-3" />, label: "Dashboard" },
-    { path: "/teacher/addclass", icon: <PlusCircle className="mr-3" />, label: "Add Class" },
-    { path: "/teacher/my-classes", icon: <BookOpen className="mr-3" />, label: "My Classes" },
-    { path: "/teacher/profile", icon: <User className="mr-3" />, label: "Profile" }
+    { path: "/teacher", icon: LayoutDashboard, label: "Dashboard" },
+    { path: "/teacher/addclass", icon: PlusCircle, label: "Add Class" },
+    { path: "/teacher/my-classes", icon: BookOpen, label: "My Classes" },
+    { path: "/teacher/profile", icon: User, label: "Profile" }
   ];
 
-  // Chart data preparation
-  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
-
+  // Chart data preparation with enhanced data
   const enrollmentData = classes.map(cls => ({
-    name: cls.title,
+    name: cls.title?.substring(0, 20) || 'Untitled',
     students: cls.totalEnrollment || 0
-  }));
+  })).slice(0, 5); // Show top 5
 
   const assignmentData = classes.map(cls => ({
-    name: cls.title,
+    name: cls.title?.substring(0, 15) || 'Untitled',
     submitted: cls.totalSubmissions || 0,
     total: cls.totalAssignments || 0
-  }));
+  })).slice(0, 5); // Show top 5
 
-  const statusData = [
-    { name: 'Approved', value: classes.filter(cls => cls.status === 'approved').length },
-    { name: 'Pending', value: classes.filter(cls => cls.status === 'pending').length },
-    { name: 'Rejected', value: classes.filter(cls => cls.status === 'rejected').length }
-  ];
+  const statusCounts = {
+    approved: classes.filter(cls => cls.status === 'approved').length,
+    pending: classes.filter(cls => cls.status === 'pending').length,
+    rejected: classes.filter(cls => cls.status === 'rejected').length
+  };
+
+  const FadeIn = ({ children, delay = 0 }) => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay }}
+    >
+      {children}
+    </motion.div>
+  );
 
   const DashboardContent = () => (
     <div className="space-y-6">
+      {/* Welcome Banner */}
+      <FadeIn>
+        <Card className="border-none shadow-sm bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900/50 dark:via-gray-800/50 dark:to-gray-900/50 backdrop-blur-xl overflow-hidden">
+          <CardContent className="p-6">
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  Welcome back, {user?.displayName}! 👋
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Here&apos;s what&apos;s happening with your classes today
+                </p>
+              </div>
+              <div className="flex items-center gap-2">
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <Link to="/teacher/addclass">
+                    <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white shadow-lg shadow-blue-500/30">
+                      <PlusCircle className="w-4 h-4 mr-2" />
+                      Create New Class
+                    </Button>
+                  </Link>
+                </motion.div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </FadeIn>
+
       {/* Stats Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="flex items-center p-6">
-            <Users className="h-8 w-8 text-blue-500" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Total Students</p>
-              <h3 className="text-2xl font-bold">{stats.totalStudents}</h3>
-            </div>
-          </CardContent>
-        </Card>
-        
-        <Card>
-          <CardContent className="flex items-center p-6">
-            <BookOpen className="h-8 w-8 text-green-500" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Total Classes</p>
-              <h3 className="text-2xl font-bold">{stats.totalClasses}</h3>
-            </div>
-          </CardContent>
-        </Card>
+        <FadeIn delay={0.1}>
+          <motion.div whileHover={{ y: -4 }}>
+            <Card className="border-none shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-900/50 backdrop-blur-xl">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Students</p>
+                    <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mt-2">
+                      {stats.totalStudents}
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Across all classes</p>
+                  </div>
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                    <Users className="w-7 h-7 text-white" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </FadeIn>
 
-        <Card>
-          <CardContent className="flex items-center p-6">
-            <FileCheck className="h-8 w-8 text-yellow-500" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Total Assignments</p>
-              <h3 className="text-2xl font-bold">{stats.totalAssignments}</h3>
-            </div>
-          </CardContent>
-        </Card>
+        <FadeIn delay={0.2}>
+          <motion.div whileHover={{ y: -4 }}>
+            <Card className="border-none shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-900/50 backdrop-blur-xl">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Classes</p>
+                    <h3 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mt-2">
+                      {stats.totalClasses}
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">
+                      {statusCounts.approved} approved
+                    </p>
+                  </div>
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/30">
+                    <BookOpen className="w-7 h-7 text-white" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </FadeIn>
 
-        <Card>
-          <CardContent className="flex items-center p-6">
-            <Star className="h-8 w-8 text-purple-500" />
-            <div className="ml-4">
-              <p className="text-sm font-medium text-gray-500">Average Rating</p>
-              <h3 className="text-2xl font-bold">{stats.averageRating}</h3>
-            </div>
-          </CardContent>
-        </Card>
+        <FadeIn delay={0.3}>
+          <motion.div whileHover={{ y: -4 }}>
+            <Card className="border-none shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-900/50 backdrop-blur-xl">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Assignments</p>
+                    <h3 className="text-3xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent mt-2">
+                      {stats.totalAssignments}
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Created</p>
+                  </div>
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-600 flex items-center justify-center shadow-lg shadow-yellow-500/30">
+                    <FileCheck className="w-7 h-7 text-white" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </FadeIn>
+
+        <FadeIn delay={0.4}>
+          <motion.div whileHover={{ y: -4 }}>
+            <Card className="border-none shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-900/50 backdrop-blur-xl">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Rating</p>
+                    <h3 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mt-2">
+                      {stats.averageRating}
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">⭐⭐⭐⭐⭐</p>
+                  </div>
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30">
+                    <Star className="w-7 h-7 text-white" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </FadeIn>
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Enrollment Chart */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Student Enrollment by Class</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={enrollmentData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="students" fill="#0088FE" />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+        <FadeIn delay={0.5}>
+          <Card className="border-none shadow-sm bg-white dark:bg-gray-900/50 backdrop-blur-xl">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">
+                Student Enrollment by Class
+              </h3>
+              {enrollmentData.length > 0 ? (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={enrollmentData}>
+                      <defs>
+                        <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                          <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.8}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+                      <XAxis 
+                        dataKey="name" 
+                        tick={{ fill: 'currentColor' }} 
+                        className="text-xs text-gray-600 dark:text-gray-400"
+                      />
+                      <YAxis 
+                        tick={{ fill: 'currentColor' }} 
+                        className="text-xs text-gray-600 dark:text-gray-400"
+                      />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                          border: 'none',
+                          borderRadius: '12px',
+                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                        }}
+                      />
+                      <Bar dataKey="students" fill="url(#barGradient)" radius={[8, 8, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
+                  <p>No enrollment data available</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </FadeIn>
 
         {/* Assignment Completion Chart */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Assignment Completion</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={assignmentData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="submitted" stroke="#00C49F" />
-                  <Line type="monotone" dataKey="total" stroke="#FF8042" />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Class Status Distribution */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Class Status Distribution</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="h-64">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={statusData}
-                    innerRadius={60}
-                    outerRadius={80}
-                    paddingAngle={5}
-                    dataKey="value"
-                  >
-                    {statusData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+        <FadeIn delay={0.6}>
+          <Card className="border-none shadow-sm bg-white dark:bg-gray-900/50 backdrop-blur-xl">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">
+                Assignment Progress
+              </h3>
+              {assignmentData.length > 0 ? (
+                <div className="h-64">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={assignmentData}>
+                      <defs>
+                        <linearGradient id="submittedGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#10b981" stopOpacity={0.8}/>
+                          <stop offset="100%" stopColor="#059669" stopOpacity={0.8}/>
+                        </linearGradient>
+                        <linearGradient id="totalGradient" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.8}/>
+                          <stop offset="100%" stopColor="#d97706" stopOpacity={0.8}/>
+                        </linearGradient>
+                      </defs>
+                      <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
+                      <XAxis 
+                        dataKey="name" 
+                        tick={{ fill: 'currentColor' }} 
+                        className="text-xs text-gray-600 dark:text-gray-400"
+                      />
+                      <YAxis 
+                        tick={{ fill: 'currentColor' }} 
+                        className="text-xs text-gray-600 dark:text-gray-400"
+                      />
+                      <Tooltip 
+                        contentStyle={{ 
+                          backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                          border: 'none',
+                          borderRadius: '12px',
+                          boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                        }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="submitted" 
+                        stroke="url(#submittedGradient)"
+                        strokeWidth={3}
+                        dot={{ fill: '#10b981', r: 4 }}
+                        name="Submitted"
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="total" 
+                        stroke="url(#totalGradient)"
+                        strokeWidth={3}
+                        dot={{ fill: '#f59e0b', r: 4 }}
+                        name="Total"
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              ) : (
+                <div className="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
+                  <p>No assignment data available</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </FadeIn>
       </div>
+
+      {/* Class Status Overview */}
+      <FadeIn delay={0.7}>
+        <Card className="border-none shadow-sm bg-white dark:bg-gray-900/50 backdrop-blur-xl">
+          <CardContent className="p-6">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">
+              Class Status Overview
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-green-700 dark:text-green-400">Approved</p>
+                    <p className="text-2xl font-bold text-green-900 dark:text-green-300 mt-1">
+                      {statusCounts.approved}
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 rounded-xl bg-green-500 flex items-center justify-center">
+                    <GraduationCap className="w-6 h-6 text-white" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-yellow-700 dark:text-yellow-400">Pending</p>
+                    <p className="text-2xl font-bold text-yellow-900 dark:text-yellow-300 mt-1">
+                      {statusCounts.pending}
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 rounded-xl bg-yellow-500 flex items-center justify-center">
+                    <Activity className="w-6 h-6 text-white" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-4 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-red-700 dark:text-red-400">Rejected</p>
+                    <p className="text-2xl font-bold text-red-900 dark:text-red-300 mt-1">
+                      {statusCounts.rejected}
+                    </p>
+                  </div>
+                  <div className="w-12 h-12 rounded-xl bg-red-500 flex items-center justify-center">
+                    <X className="w-6 h-6 text-white" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </FadeIn>
     </div>
   );
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      {/* Mobile Sidebar Overlay */}
-      {isSidebarOpen && (
-        <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
-          onClick={() => setIsSidebarOpen(false)}
-        />
-      )}
+    <div className="flex h-screen bg-gray-50 dark:bg-gray-950">
+      <AnimatePresence>
+        {/* Mobile Sidebar Overlay */}
+        {isSidebarOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-20 lg:hidden"
+            onClick={() => setIsSidebarOpen(false)}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Sidebar */}
-      <div
-        className={`fixed lg:static w-64 bg-white shadow-md h-full z-30 transform transition-transform duration-300 ease-in-out ${
+      <aside
+        className={`fixed lg:static w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 h-full z-30 transform transition-transform duration-300 ease-in-out ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
       >
         <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between h-20 px-6 shadow-md">
-            <h1 className="text-3xl font-bold text-blue-600">TeacherHub</h1>
+          {/* Logo */}
+          <div className="flex items-center justify-between h-20 px-6 border-b border-gray-200 dark:border-gray-800">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                <GraduationCap className="w-6 h-6 text-white" />
+              </div>
+              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                TeacherHub
+              </h1>
+            </div>
             <button
-              className="lg:hidden text-gray-600 hover:text-gray-800"
+              className="lg:hidden text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
               onClick={() => setIsSidebarOpen(false)}
             >
-              <X className="h-6 w-6" />
+              <X className="h-5 w-5" />
             </button>
           </div>
-          <ul className="flex flex-col py-4">
-            {navItems.map((item) => (
-              <li key={item.path}>
+
+          {/* Navigation */}
+          <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+            {navItems.map((item, index) => (
+              <motion.div
+                key={item.path}
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.1 }}
+              >
                 <NavLink
                   to={item.path}
+                  end={item.path === "/teacher"}
                   className={({ isActive }) =>
-                    `flex items-center px-6 py-3 text-gray-700 hover:bg-blue-100 transition-colors ${
-                      isActive ? "bg-blue-100 text-blue-600 font-medium" : ""
+                    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                      isActive
+                        ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/30"
+                        : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
                     }`
                   }
                   onClick={() => setIsSidebarOpen(false)}
                 >
-                  {item.icon}
-                  {item.label}
+                  <item.icon className="w-5 h-5" />
+                  <span>{item.label}</span>
                 </NavLink>
-              </li>
+              </motion.div>
             ))}
-          </ul>
-          <div className="mt-auto space-y-4 mb-4 px-6">
-            <Link to='/' className="w-full btn flex items-center justify-center hover:bg-blue-50">
-              <Home className="mr-2 h-4 w-4" /> Home
+          </nav>
+
+          {/* Bottom Actions */}
+          <div className="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
+            <Link to="/">
+              <Button
+                variant="ghost"
+                className="w-full justify-start text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+              >
+                <Home className="mr-3 h-5 w-5" />
+                Home
+              </Button>
             </Link>
             <Button
               variant="ghost"
-              className="w-full hover:bg-red-100 hover:text-red-600 transition-colors"
+              className="w-full justify-start text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
               onClick={handleLogout}
             >
-              <LogOut className="mr-2 h-4 w-4" /> Logout
+              <LogOut className="mr-3 h-5 w-5" />
+              Logout
             </Button>
           </div>
         </div>
-      </div>
+      </aside>
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <header className="flex items-center justify-between px-4 lg:px-6 py-4 bg-white shadow-md">
-          <div className="flex items-center">
-            <button
-              className="lg:hidden mr-4 text-gray-600 hover:text-gray-800"
-              onClick={() => setIsSidebarOpen(true)}
-            >
-              <Menu className="h-6 w-6" />
-            </button>
-            <h2 className="text-xl lg:text-2xl font-semibold text-gray-800">Teacher Dashboard</h2>
-          </div>
-          <div className="flex items-center">
-            <div className="hidden sm:block mr-4">
-              <span className="font-medium text-gray-700">{user?.displayName}</span>
+        <header className="h-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
+          <div className="h-full px-4 lg:px-8 flex items-center justify-between">
+            <div className="flex items-center gap-4">
+              <button
+                className="lg:hidden p-2 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                onClick={() => setIsSidebarOpen(true)}
+              >
+                <Menu className="h-5 w-5" />
+              </button>
+              <div>
+                <h2 className="text-lg lg:text-xl font-bold text-gray-900 dark:text-white">
+                  Teacher Dashboard
+                </h2>
+                <p className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">
+                  Manage your classes and track student progress
+                </p>
+              </div>
             </div>
-            <img
-              src={user?.photoURL || "/placeholder.svg"}
-              alt="Profile"
-              className="w-8 h-8 lg:w-10 lg:h-10 rounded-full"
-            />
+
+            <div className="flex items-center gap-3">
+              <ThemeToggle />
+              <div className="hidden sm:flex flex-col items-end mr-3">
+                <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                  {user?.displayName}
+                </span>
+                <span className="text-xs text-gray-500 dark:text-gray-400">Teacher</span>
+              </div>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <div className="relative">
+                  <img
+                    src={user?.photoURL || "/placeholder.svg"}
+                    alt="Profile"
+                    className="w-10 h-10 rounded-xl object-cover ring-2 ring-gray-200 dark:ring-gray-700"
+                  />
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white dark:border-gray-900" />
+                </div>
+              </motion.div>
+            </div>
           </div>
         </header>
 
         {/* Content */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-4 lg:p-6">
+        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-950 p-4 lg:p-8">
           {window.location.pathname === '/teacher' ? <DashboardContent /> : <Outlet />}
         </main>
       </div>
