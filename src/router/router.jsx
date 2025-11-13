@@ -24,6 +24,7 @@ import ClassDetailsEnroll from "@/pages/class/ClassDetailsEnroll";
 import PaymentPage from "@/pages/class/PaymentPage";
 import ErrorPage from "@/pages/ErrorPage";
 import PrivateRouter from "./PrivateRouter";
+import UIShowcasePage from "@/pages/UIShowcasePage";
 
 const router = createBrowserRouter([
     {
@@ -49,6 +50,10 @@ const router = createBrowserRouter([
             {
                 path: '/teach',
                 element: <PrivateRouter><TeachForm/></PrivateRouter>
+            },
+            {
+                path: '/ui-showcase',
+                element: <UIShowcasePage/>
             }
 
         ]

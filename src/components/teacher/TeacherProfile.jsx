@@ -1,196 +1,323 @@
-import { useContext, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { useContext, useState, useEffect } from "react"
+import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { AuthContext } from "@/provider/AuthProvider"
-import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { motion } from "framer-motion"
+import axios from "axios"
 import {
   BookOpen,
   Mail,
   Star,
   Users,
   Award,
-  Book,
-  CalendarDays,
-  GraduationCap
+  Calendar,
+  GraduationCap,
+  TrendingUp,
+  Target,
+  Activity,
+  FileCheck
 } from "lucide-react"
 
 const TeacherProfile = () => {
   const { user } = useContext(AuthContext)
-  const [isEditing, setIsEditing] = useState(false)
+  const [stats, setStats] = useState({
+    totalStudents: 0,
+    totalClasses: 0,
+    totalAssignments: 0,
+    averageRating: 0,
+    approvedClasses: 0
+  })
+  const [loading, setLoading] = useState(true)
 
-  const teacherStats = {
-    experience: "5+ years",
-    totalStudents: "250+",
-    coursesCreated: "12",
-    rating: "4.8",
-    specialization: "Computer Science",
-    totalReviews: "180",
-    activeClasses: "4",
-    nextClass: "Advanced Web Development - 2:00 PM"
-  }
+  useEffect(() => {
+    const fetchTeacherStats = async () => {
+      try {
+        setLoading(true)
+        const response = await axios.get(
+          `https://edumanagebackend.vercel.app/classes?instructorEmail=${user?.email}`
+        )
+        const classes = response.data.classes || []
+        
+        const totalStudents = classes.reduce((acc, cls) => acc + (cls.totalEnrollment || 0), 0)
+        const totalAssignments = classes.reduce((acc, cls) => acc + (cls.totalAssignments || 0), 0)
+        const avgRating = classes.length > 0 
+          ? classes.reduce((acc, cls) => acc + (cls.averageRating || 0), 0) / classes.length 
+          : 0
+        const approvedClasses = classes.filter(cls => cls.status === 'approved').length
 
-  const TeacherStatCard = ({ icon: Icon, label, value, bgColor }) => (
-    <Card className="border-none shadow-md">
-      <CardContent className={`${bgColor} p-4 rounded-lg`}>
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-white bg-opacity-90 rounded-lg">
-            <Icon className="w-5 h-5 text-gray-700" />
-          </div>
-          <div>
-            <p className="text-sm font-medium text-gray-700">{label}</p>
-            <p className="text-lg font-semibold text-gray-900">{value}</p>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+        setStats({
+          totalStudents,
+          totalClasses: classes.length,
+          totalAssignments,
+          averageRating: avgRating.toFixed(1),
+          approvedClasses
+        })
+      } catch (error) {
+        console.error('Error fetching teacher stats:', error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (user?.email) {
+      fetchTeacherStats()
+    }
+  }, [user?.email])
+
+  const FadeIn = ({ children, delay = 0 }) => (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, delay }}
+    >
+      {children}
+    </motion.div>
   )
 
+  if (loading) {
+    return (
+      <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
+        <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
+        <p className="text-gray-600 dark:text-gray-400 font-medium">Loading profile...</p>
+      </div>
+    )
+  }
+
   return (
-    <div className="max-w-7xl mx-auto p-6">
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        {/* Main Profile Section */}
-        <Card className="lg:col-span-3 border-none shadow-lg">
-          <CardHeader className="flex flex-row items-center justify-between">
-            <div>
-              <CardTitle className="text-3xl font-bold text-gray-800">
-                Teacher Profile
-              </CardTitle>
-              <p className="text-gray-600 mt-1">Educational Expert</p>
-            </div>
-            <Button 
-              variant="outline"
-              onClick={() => setIsEditing(!isEditing)}
-              className="bg-emerald-50 hover:bg-emerald-100 text-emerald-700"
-            >
-              {isEditing ? "Save Changes" : "Edit Profile"}
-            </Button>
-          </CardHeader>
-          
-          <CardContent className="space-y-8">
-            {/* Profile Header */}
-            <div className="flex flex-col md:flex-row items-center gap-6 bg-gradient-to-r text-black from-emerald-50 to-teal-50 p-6 rounded-xl">
-              <div className="relative">
-                <Avatar className="w-36 h-36 border-4 border-white shadow-lg">
-                  <AvatarImage src={user.photoURL} alt={user.displayName} />
-                  <AvatarFallback className="text-3xl bg-emerald-100 text-emerald-700">
-                    {user.displayName?.charAt(0)}
+    <div className="space-y-6">
+      {/* Profile Header */}
+      <FadeIn>
+        <Card className="border-none shadow-sm bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900/50 dark:via-gray-800/50 dark:to-gray-900/50 backdrop-blur-xl overflow-hidden">
+          <CardContent className="p-8">
+            <div className="flex flex-col md:flex-row items-center gap-8">
+              {/* Avatar with Glow */}
+              <motion.div 
+                className="relative"
+                whileHover={{ scale: 1.05 }}
+                transition={{ duration: 0.3 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl blur-xl opacity-30 animate-pulse" />
+                <Avatar className="w-32 h-32 rounded-3xl border-4 border-white dark:border-gray-800 shadow-2xl relative">
+                  <AvatarImage src={user?.photoURL} alt={user?.displayName} />
+                  <AvatarFallback className="text-4xl bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-3xl">
+                    {user?.displayName?.charAt(0)}
                   </AvatarFallback>
                 </Avatar>
-                <Badge className="absolute -bottom-2 right-0 bg-emerald-100 text-emerald-700 px-4">
-                  Verified Teacher
-                </Badge>
-              </div>
-              
-              <div className="text-center text-gray-800 md:text-left space-y-3">
-                <h2 className="text-2xl font-bold">{user.displayName}</h2>
-                <div className="flex flex-wrap gap-2 text-gray-800 justify-center md:justify-start">
-                    
+                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white dark:border-gray-900" />
+              </motion.div>
+
+              {/* Info */}
+              <div className="flex-1 text-center md:text-left">
+                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                  {user?.displayName}
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400 mb-4">{user?.email}</p>
+                <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+                  <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-none shadow-lg shadow-blue-500/30">
+                    <GraduationCap className="w-3 h-3 mr-1" />
+                    Teacher
+                  </Badge>
+                  <Badge className="bg-green-500 text-white border-none">
+                    <Activity className="w-3 h-3 mr-1" />
+                    Active
+                  </Badge>
+                  <Badge className="bg-yellow-500 text-white border-none">
+                    <Star className="w-3 h-3 mr-1" />
+                    {stats.averageRating} Rating
+                  </Badge>
                 </div>
-                <p className="text-gray-600 ">
-                  {teacherStats.experience} Teaching Experience
-                </p>
               </div>
             </div>
+          </CardContent>
+        </Card>
+      </FadeIn>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <TeacherStatCard
-                icon={Users}
-                label="Total Students"
-                value={teacherStats.totalStudents}
-                bgColor="bg-blue-50"
-              />
-              <TeacherStatCard
-                icon={BookOpen}
-                label="Courses Created"
-                value={teacherStats.coursesCreated}
-                bgColor="bg-emerald-50"
-              />
-              <TeacherStatCard
-                icon={Star}
-                label="Reviews"
-                value={teacherStats.totalReviews}
-                bgColor="bg-amber-50"
-              />
-              <TeacherStatCard
-                icon={Award}
-                label="Active Classes"
-                value={teacherStats.activeClasses}
-                bgColor="bg-purple-50"
-              />
-            </div>
-
-            {/* Contact Information */}
-            <Card className="border-none bg-gray-50">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+        <FadeIn delay={0.1}>
+          <motion.div whileHover={{ y: -4 }}>
+            <Card className="border-none shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-900/50 backdrop-blur-xl overflow-hidden">
               <CardContent className="p-6">
-                <h3 className="text-lg font-semibold mb-4">Contact Information</h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <Mail className="w-5 h-5 text-gray-500" />
-                    <span>{user.email}</span>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Students</p>
+                    <h3 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent mt-2">
+                      {stats.totalStudents}
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Enrolled</p>
                   </div>
-                  <div className="flex items-center gap-2 text-gray-700">
-                    <CalendarDays className="w-5 h-5 text-gray-500" />
-                    <span>Next Class: {teacherStats.nextClass}</span>
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-cyan-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                    <Users className="w-7 h-7 text-white" />
                   </div>
                 </div>
               </CardContent>
             </Card>
+          </motion.div>
+        </FadeIn>
+
+        <FadeIn delay={0.2}>
+          <motion.div whileHover={{ y: -4 }}>
+            <Card className="border-none shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-900/50 backdrop-blur-xl overflow-hidden">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Total Classes</p>
+                    <h3 className="text-3xl font-bold bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent mt-2">
+                      {stats.totalClasses}
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">{stats.approvedClasses} approved</p>
+                  </div>
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/30">
+                    <BookOpen className="w-7 h-7 text-white" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </FadeIn>
+
+        <FadeIn delay={0.3}>
+          <motion.div whileHover={{ y: -4 }}>
+            <Card className="border-none shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-900/50 backdrop-blur-xl overflow-hidden">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Assignments</p>
+                    <h3 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent mt-2">
+                      {stats.totalAssignments}
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">Created</p>
+                  </div>
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30">
+                    <FileCheck className="w-7 h-7 text-white" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </FadeIn>
+
+        <FadeIn delay={0.4}>
+          <motion.div whileHover={{ y: -4 }}>
+            <Card className="border-none shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-900/50 backdrop-blur-xl overflow-hidden">
+              <CardContent className="p-6">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-400">Avg Rating</p>
+                    <h3 className="text-3xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent mt-2">
+                      {stats.averageRating}
+                    </h3>
+                    <p className="text-xs text-gray-500 dark:text-gray-500 mt-1">⭐⭐⭐⭐⭐</p>
+                  </div>
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-600 flex items-center justify-center shadow-lg shadow-yellow-500/30">
+                    <Star className="w-7 h-7 text-white" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        </FadeIn>
+      </div>
+
+      {/* Performance Metrics */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <FadeIn delay={0.5}>
+          <Card className="border-none shadow-sm bg-white dark:bg-gray-900/50 backdrop-blur-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+                  <Target className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Teaching Quality</h3>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Course Completion</span>
+                  <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-none">98%</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Student Satisfaction</span>
+                  <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400 border-none">96%</Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </FadeIn>
+
+        <FadeIn delay={0.6}>
+          <Card className="border-none shadow-sm bg-white dark:bg-gray-900/50 backdrop-blur-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-purple-600 dark:text-purple-400" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Growth</h3>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">This Month</span>
+                  <Badge className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 border-none">+12%</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">New Students</span>
+                  <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-none">+24</Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </FadeIn>
+
+        <FadeIn delay={0.7}>
+          <Card className="border-none shadow-sm bg-white dark:bg-gray-900/50 backdrop-blur-xl">
+            <CardContent className="p-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="w-12 h-12 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+                  <Award className="w-6 h-6 text-green-600 dark:text-green-400" />
+                </div>
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">Achievements</h3>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Top Rated</span>
+                  <Badge className="bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400 border-none">★ 4.8</Badge>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-sm text-gray-600 dark:text-gray-400">Response Rate</span>
+                  <Badge className="bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 border-none">100%</Badge>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </FadeIn>
+      </div>
+
+      {/* Contact Information */}
+      <FadeIn delay={0.8}>
+        <Card className="border-none shadow-sm bg-white dark:bg-gray-900/50 backdrop-blur-xl">
+          <CardContent className="p-6">
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6">Contact Information</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                <Mail className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-500">Email Address</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">{user?.email}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-50 dark:bg-gray-800/50">
+                <Calendar className="w-5 h-5 text-purple-600 dark:text-purple-400" />
+                <div>
+                  <p className="text-xs text-gray-500 dark:text-gray-500">Member Since</p>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    {new Date(user?.metadata?.creationTime).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            </div>
           </CardContent>
         </Card>
-
-        {/* Right Sidebar */}
-        <div className="space-y-6">
-          <Card className="border-none shadow-lg bg-gradient-to-b from-emerald-50 to-teal-50">
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold mb-4 text-gray-800">Quick Overview</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Course Completion Rate</span>
-                  <Badge className="bg-emerald-100 text-emerald-700">98%</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Student Satisfaction</span>
-                  <Badge className="bg-amber-100 text-amber-700">96%</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-600">Response Rate</span>
-                  <Badge className="bg-blue-100 text-blue-700">100%</Badge>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-none shadow-lg">
-            <CardContent className="p-6">
-              <h3 className="text-lg font-semibold mb-4 text-gray-800">
-                Teaching Schedule
-              </h3>
-              <div className="space-y-3">
-                <div className="flex items-center gap-2">
-                  <Book className="w-4 h-4 text-emerald-600" />
-                  <span className="text-sm text-gray-600">
-                    Advanced Web Development
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Book className="w-4 h-4 text-emerald-600" />
-                  <span className="text-sm text-gray-600">
-                    React Fundamentals
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Book className="w-4 h-4 text-emerald-600" />
-                  <span className="text-sm text-gray-600">
-                    JavaScript Mastery
-                  </span>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
+      </FadeIn>
     </div>
   )
 }
