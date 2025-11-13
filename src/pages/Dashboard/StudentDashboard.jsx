@@ -2,7 +2,7 @@ import { Link, NavLink, Outlet, useNavigate } from "react-router-dom"
 import { useContext, useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { LayoutDashboard, BookOpen, User, LogOut, Menu, X, Home, GraduationCap, Star, Clock, TrendingUp, Award, Activity, ChevronRight } from "lucide-react"
+import { LayoutDashboard, BookOpen, User, LogOut, Menu, X, Home, GraduationCap, Star, Clock, TrendingUp, Award, Activity, ChevronRight, Brain, MessageCircle, BarChart3, Bell, Sparkles, Trophy } from "lucide-react"
 import { AuthContext } from "@/provider/AuthProvider"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { motion, AnimatePresence } from "framer-motion"
@@ -62,6 +62,12 @@ const DashboardLayout = () => {
   const navItems = [
     { path: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
     { path: "/dashboard/my-enroll-class", icon: BookOpen, label: "My Enroll Class" },
+    { path: "/dashboard/quiz-generator", icon: Brain, label: "Quiz Generator" },
+    { path: "/dashboard/ai-study-buddy", icon: MessageCircle, label: "AI Study Buddy" },
+    { path: "/dashboard/analytics", icon: BarChart3, label: "Analytics" },
+    { path: "/dashboard/flashcards", icon: Sparkles, label: "Flashcards" },
+    { path: "/dashboard/achievements", icon: Trophy, label: "Achievements" },
+    { path: "/dashboard/notifications", icon: Bell, label: "Notifications" },
     { path: "/dashboard/profile", icon: User, label: "Profile" },
   ]
 
