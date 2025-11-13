@@ -39,9 +39,14 @@ const AuthProvider = ({ children }) => {
       const provider = new GoogleAuthProvider();
       return signInWithPopup(auth, provider);
   };
-  const updateUserProfile = (profile) => {
-    setLoading(true);
-    return updateProfile(auth.currentUser, profile);
+  const updateUserProfile = async (profile) => {
+    try {
+      await updateProfile(auth.currentUser, profile);
+      setUser({ ...auth.currentUser, ...profile });
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
   };
 
     const authInfo = {

@@ -20,10 +20,17 @@ import AddClass from "@/components/teacher/AddClass";
 import MyClasses from "@/components/teacher/Myclasses";
 import TeacherProfile from "@/components/teacher/TeacherProfile";
 import ClassDetails from "@/components/teacher/ClassDetails";
+import AILectureNotesGenerator from "@/components/teacher/AILectureNotesGenerator";
 import ClassDetailsEnroll from "@/pages/class/ClassDetailsEnroll";
 import PaymentPage from "@/pages/class/PaymentPage";
 import ErrorPage from "@/pages/ErrorPage";
 import PrivateRouter from "./PrivateRouter";
+import InteractiveQuizGenerator from "@/components/teacher/InteractiveQuizGenerator";
+import AIStudyBuddy from "@/components/studentdashboard/AIStudyBuddy";
+import PerformanceAnalytics from "@/components/studentdashboard/PerformanceAnalytics";
+import NotificationsCenter from "@/components/studentdashboard/NotificationsCenter";
+import FlashcardGenerator from "@/components/studentdashboard/FlashcardGenerator";
+import AchievementSystem from "@/components/studentdashboard/AchievementSystem";
 import UIShowcasePage from "@/pages/UIShowcasePage";
 
 const router = createBrowserRouter([
@@ -86,6 +93,30 @@ const router = createBrowserRouter([
             {
                 path:'profile',
                 element:<PrivateRouter><MyProfile/></PrivateRouter>
+            },
+            {
+                path:'quiz-generator',
+                element:<PrivateRouter><InteractiveQuizGenerator/></PrivateRouter>
+            },
+            {
+                path:'ai-study-buddy',
+                element:<PrivateRouter><AIStudyBuddy/></PrivateRouter>
+            },
+            {
+                path:'analytics',
+                element:<PrivateRouter><PerformanceAnalytics/></PrivateRouter>
+            },
+            {
+                path:'flashcards',
+                element:<PrivateRouter><FlashcardGenerator/></PrivateRouter>
+            },
+            {
+                path:'achievements',
+                element:<PrivateRouter><AchievementSystem/></PrivateRouter>
+            },
+            {
+                path:'notifications',
+                element:<PrivateRouter><NotificationsCenter/></PrivateRouter>
             }
         ]
     },{
@@ -122,6 +153,10 @@ const router = createBrowserRouter([
             path:'my-classes/:id',
             element:<PrivateRouter><ClassDetails/></PrivateRouter>  ,
             loader:({params})=>fetch(`https://edumanagebackend.vercel.app/classes/${params.id}`)
+        },
+        {
+            path:'ai-lecture-notes',
+            element:<PrivateRouter><AILectureNotesGenerator/></PrivateRouter>
         },
         {
             path:'profile',

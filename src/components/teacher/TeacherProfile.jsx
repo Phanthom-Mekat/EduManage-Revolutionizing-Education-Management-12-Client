@@ -3,8 +3,13 @@ import { Card, CardContent } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { AuthContext } from "@/provider/AuthProvider"
 import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Textarea } from "@/components/ui/textarea"
 import { motion } from "framer-motion"
 import axios from "axios"
+import toast from "react-hot-toast"
 import {
   BookOpen,
   Mail,
@@ -16,11 +21,24 @@ import {
   TrendingUp,
   Target,
   Activity,
-  FileCheck
+  FileCheck,
+  Edit2,
+  Check,
+  X,
+  Phone
 } from "lucide-react"
 
 const TeacherProfile = () => {
-  const { user } = useContext(AuthContext)
+  const { user, updateUserProfile } = useContext(AuthContext)
+  const [isEditing, setIsEditing] = useState(false)
+  const [formData, setFormData] = useState({
+    displayName: "",
+    email: "",
+    phoneNumber: "",
+    photoURL: "",
+    bio: ""
+  })
+  const [loading, setLoading] = useState(false)
   const [stats, setStats] = useState({
     totalStudents: 0,
     totalClasses: 0,
@@ -28,12 +46,27 @@ const TeacherProfile = () => {
     averageRating: 0,
     approvedClasses: 0
   })
-  const [loading, setLoading] = useState(true)
+  const [statsLoading, setStatsLoading] = useState(true)
+  const [initialized, setInitialized] = useState(false)
+
+  // Initialize form data only once when user is first available
+  useEffect(() => {
+    if (user && !initialized) {
+      setFormData({
+        displayName: user.displayName || "",
+        email: user.email || "",
+        phoneNumber: user.phoneNumber || "",
+        photoURL: user.photoURL || "",
+        bio: ""
+      })
+      setInitialized(true)
+    }
+  }, [user, initialized])
 
   useEffect(() => {
     const fetchTeacherStats = async () => {
       try {
-        setLoading(true)
+        setStatsLoading(true)
         const response = await axios.get(
           `https://edumanagebackend.vercel.app/classes?instructorEmail=${user?.email}`
         )
@@ -56,7 +89,7 @@ const TeacherProfile = () => {
       } catch (error) {
         console.error('Error fetching teacher stats:', error)
       } finally {
-        setLoading(false)
+        setStatsLoading(false)
       }
     }
 
@@ -64,6 +97,41 @@ const TeacherProfile = () => {
       fetchTeacherStats()
     }
   }, [user?.email])
+
+  const handleSaveChanges = async () => {
+    setLoading(true)
+    try {
+      await updateUserProfile({
+        displayName: formData.displayName,
+        photoURL: formData.photoURL
+      })
+      toast.success("Profile updated successfully!")
+      setIsEditing(false)
+    } catch (error) {
+      console.error("Error updating profile:", error)
+      toast.error("Failed to update profile. Please try again.")
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleCancel = () => {
+    setFormData({
+      displayName: user?.displayName || "",
+      email: user?.email || "",
+      phoneNumber: user?.phoneNumber || "",
+      photoURL: user?.photoURL || "",
+      bio: ""
+    })
+    setIsEditing(false)
+  }
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value
+    })
+  }
 
   const FadeIn = ({ children, delay = 0 }) => (
     <motion.div
@@ -75,7 +143,7 @@ const TeacherProfile = () => {
     </motion.div>
   )
 
-  if (loading) {
+  if (statsLoading) {
     return (
       <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
         <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
@@ -86,49 +154,153 @@ const TeacherProfile = () => {
 
   return (
     <div className="space-y-6">
+      {/* Header with Edit Button */}
+      <FadeIn>
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-1">Teacher Profile</h1>
+            <p className="text-gray-600 dark:text-gray-400">Manage your profile and view teaching statistics</p>
+          </div>
+          <div className="flex gap-2">
+            {isEditing ? (
+              <>
+                <Button 
+                  variant="outline"
+                  onClick={handleCancel}
+                  disabled={loading}
+                  className="gap-2"
+                >
+                  <X className="w-4 h-4" />
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleSaveChanges}
+                  disabled={loading}
+                  className="gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white border-none"
+                >
+                  <Check className="w-4 h-4" />
+                  {loading ? "Saving..." : "Save Changes"}
+                </Button>
+              </>
+            ) : (
+              <Button 
+                variant="outline"
+                onClick={() => setIsEditing(true)}
+                className="gap-2"
+              >
+                <Edit2 className="w-4 h-4" />
+                Edit Profile
+              </Button>
+            )}
+          </div>
+        </div>
+      </FadeIn>
+
       {/* Profile Header */}
       <FadeIn>
         <Card className="border-none shadow-sm bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50 dark:from-gray-900/50 dark:via-gray-800/50 dark:to-gray-900/50 backdrop-blur-xl overflow-hidden">
           <CardContent className="p-8">
-            <div className="flex flex-col md:flex-row items-center gap-8">
-              {/* Avatar with Glow */}
-              <motion.div 
-                className="relative"
-                whileHover={{ scale: 1.05 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl blur-xl opacity-30 animate-pulse" />
-                <Avatar className="w-32 h-32 rounded-3xl border-4 border-white dark:border-gray-800 shadow-2xl relative">
-                  <AvatarImage src={user?.photoURL} alt={user?.displayName} />
-                  <AvatarFallback className="text-4xl bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-3xl">
-                    {user?.displayName?.charAt(0)}
-                  </AvatarFallback>
-                </Avatar>
-                <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white dark:border-gray-900" />
-              </motion.div>
-
-              {/* Info */}
-              <div className="flex-1 text-center md:text-left">
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-                  {user?.displayName}
-                </h2>
-                <p className="text-gray-600 dark:text-gray-400 mb-4">{user?.email}</p>
-                <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                  <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-none shadow-lg shadow-blue-500/30">
-                    <GraduationCap className="w-3 h-3 mr-1" />
-                    Teacher
-                  </Badge>
-                  <Badge className="bg-green-500 text-white border-none">
-                    <Activity className="w-3 h-3 mr-1" />
-                    Active
-                  </Badge>
-                  <Badge className="bg-yellow-500 text-white border-none">
-                    <Star className="w-3 h-3 mr-1" />
-                    {stats.averageRating} Rating
-                  </Badge>
+            {isEditing ? (
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <Label htmlFor="displayName" className="text-gray-700 dark:text-gray-300">Full Name</Label>
+                    <Input
+                      id="displayName"
+                      name="displayName"
+                      value={formData.displayName}
+                      onChange={handleChange}
+                      placeholder="Enter your full name"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="photoURL" className="text-gray-700 dark:text-gray-300">Profile Photo URL</Label>
+                    <Input
+                      id="photoURL"
+                      name="photoURL"
+                      value={formData.photoURL}
+                      onChange={handleChange}
+                      placeholder="https://example.com/photo.jpg"
+                      className="mt-1"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="email" className="text-gray-700 dark:text-gray-300">Email (Read-only)</Label>
+                    <Input
+                      id="email"
+                      name="email"
+                      value={formData.email}
+                      disabled
+                      className="mt-1 bg-gray-100 dark:bg-gray-800"
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="phoneNumber" className="text-gray-700 dark:text-gray-300">Phone Number</Label>
+                    <Input
+                      id="phoneNumber"
+                      name="phoneNumber"
+                      value={formData.phoneNumber}
+                      onChange={handleChange}
+                      placeholder="Enter your phone number"
+                      className="mt-1"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <Label htmlFor="bio" className="text-gray-700 dark:text-gray-300">Bio</Label>
+                  <Textarea
+                    id="bio"
+                    name="bio"
+                    value={formData.bio}
+                    onChange={handleChange}
+                    placeholder="Tell us about yourself..."
+                    className="mt-1"
+                    rows={3}
+                  />
                 </div>
               </div>
-            </div>
+            ) : (
+              <div className="flex flex-col md:flex-row items-center gap-8">
+                {/* Avatar with Glow */}
+                <motion.div 
+                  className="relative"
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-blue-500 to-purple-600 rounded-3xl blur-xl opacity-30 animate-pulse" />
+                  <Avatar className="w-32 h-32 rounded-3xl border-4 border-white dark:border-gray-800 shadow-2xl relative">
+                    <AvatarImage src={user?.photoURL} alt={user?.displayName} />
+                    <AvatarFallback className="text-4xl bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-3xl">
+                      {user?.displayName?.charAt(0)}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-green-500 rounded-full border-4 border-white dark:border-gray-900" />
+                </motion.div>
+
+                {/* Info */}
+                <div className="flex-1 text-center md:text-left">
+                  <h2 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                    {user?.displayName}
+                  </h2>
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">{user?.email}</p>
+                  <div className="flex flex-wrap gap-2 justify-center md:justify-start">
+                    <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white border-none shadow-lg shadow-blue-500/30">
+                      <GraduationCap className="w-3 h-3 mr-1" />
+                      Teacher
+                    </Badge>
+                    <Badge className="bg-green-500 text-white border-none">
+                      <Activity className="w-3 h-3 mr-1" />
+                      Active
+                    </Badge>
+                    <Badge className="bg-yellow-500 text-white border-none">
+                      <Star className="w-3 h-3 mr-1" />
+                      {stats.averageRating} Rating
+                    </Badge>
+                  </div>
+                </div>
+              </div>
+            )}
           </CardContent>
         </Card>
       </FadeIn>

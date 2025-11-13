@@ -15,7 +15,8 @@ import {
   FileCheck,
   Star,
   GraduationCap,
-  Activity
+  Activity,
+  Sparkles
 } from "lucide-react";
 import { AuthContext } from "@/provider/AuthProvider";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
@@ -73,6 +74,7 @@ const TeacherDashBoardLayout = () => {
     { path: "/teacher", icon: LayoutDashboard, label: "Dashboard" },
     { path: "/teacher/addclass", icon: PlusCircle, label: "Add Class" },
     { path: "/teacher/my-classes", icon: BookOpen, label: "My Classes" },
+    { path: "/teacher/ai-lecture-notes", icon: Sparkles, label: "AI Lecture Notes" },
     { path: "/teacher/profile", icon: User, label: "Profile" }
   ];
 
