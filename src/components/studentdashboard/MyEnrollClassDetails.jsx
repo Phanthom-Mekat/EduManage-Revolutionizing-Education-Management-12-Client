@@ -112,10 +112,21 @@ const MyEnrollClassDetails = () => {
   };
 
   const handleEvaluationSubmit = async () => {
+    if (!evaluation.description.trim() || evaluation.rating === 0) {
+      setSubmitSuccess("Please provide both a description and rating");
+      return;
+    }
+    
+    setSubmitting(true);
     try {
       const res = await fetch('https://edumanagebackend.vercel.app/users');
       const users = await res.json();
       const userId = users.find((u) => u.email === user?.email)?.uid;
+      
+      if (!userId) {
+        throw new Error('User not found');
+      }
+      
       const response = await fetch(`https://edumanagebackend.vercel.app/classes/${id}/evaluate`, {
         method: 'POST',
         headers: {
@@ -123,20 +134,25 @@ const MyEnrollClassDetails = () => {
         },
         body: JSON.stringify({
           userId: userId,
-          name: user?.displayName,
-          photo:user?.photoURL,
+          name: user?.displayName || 'Anonymous',
+          photo: user?.photoURL || '',
           rating: evaluation.rating,
-          description: evaluation.description
+          description: evaluation.description.trim()
         })
       });
 
-      if (!response.ok) throw new Error('Failed to submit evaluation');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(errorData.message || 'Failed to submit evaluation');
+      }
 
       setIsEvaluationOpen(false);
       setEvaluation({ description: "", rating: 0 });
       setSubmitSuccess("Evaluation submitted successfully!");
     } catch (err) {
       setSubmitSuccess("Failed to submit evaluation: " + err.message);
+    } finally {
+      setSubmitting(false);
     }
   };
 
@@ -251,13 +267,22 @@ const MyEnrollClassDetails = () => {
                       <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
                         Rating
                       </label>
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center gap-3">
                         <Rating
                           onClick={(rate) => setEvaluation({ ...evaluation, rating: rate })}
                           initialValue={evaluation.rating}
-                          size={30}
+                          size={32}
+                          transition
+                          fillColor="#f59e0b"
+                          emptyColor="#d1d5db"
+                          SVGclassName="inline-block"
+                          allowFraction={false}
+                          showTooltip
+                          tooltipArray={['Poor', 'Fair', 'Good', 'Very Good', 'Excellent']}
+                          tooltipDefaultText="Select a rating"
+                          tooltipClassName="!bg-gray-800 !text-white !text-xs !px-2 !py-1 !rounded"
                         />
-                        <span className="text-sm text-gray-600 dark:text-gray-400">
+                        <span className="text-sm font-medium text-gray-600 dark:text-gray-400 min-w-[60px]">
                           {evaluation.rating > 0 ? `${evaluation.rating}/5` : 'No rating'}
                         </span>
                       </div>
@@ -265,10 +290,19 @@ const MyEnrollClassDetails = () => {
                     <Button 
                       onClick={handleEvaluationSubmit} 
                       className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
-                      disabled={!evaluation.description || evaluation.rating === 0}
+                      disabled={!evaluation.description.trim() || evaluation.rating === 0 || submitting}
                     >
-                      <CheckCircle className="w-4 h-4 mr-2" />
-                      Send Evaluation
+                      {submitting ? (
+                        <>
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Submitting...
+                        </>
+                      ) : (
+                        <>
+                          <CheckCircle className="w-4 h-4 mr-2" />
+                          Send Evaluation
+                        </>
+                      )}
                     </Button>
                   </div>
                 </DialogContent>
