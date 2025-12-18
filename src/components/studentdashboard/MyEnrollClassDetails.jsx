@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Rating } from "react-simple-star-rating";
-import { Loader2, Upload, Calendar, FileText, CheckCircle, Star, ArrowLeft, AlertCircle, User } from "lucide-react";
+import { Loader2, Upload, Calendar, FileText, CheckCircle, Star, ArrowLeft, AlertCircle, User, Link2, Copy, Check } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthContext } from "@/provider/AuthProvider";
 import { motion } from "framer-motion";
@@ -33,7 +33,7 @@ FadeIn.defaultProps = {
 };
 
 const MyEnrollClassDetails = () => {
-    const {user} = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const { id } = useParams();
   const [classDetails, setClassDetails] = useState(null);
   const [assignments, setAssignments] = useState([]);
@@ -43,6 +43,17 @@ const MyEnrollClassDetails = () => {
   const [evaluation, setEvaluation] = useState({ description: "", rating: 0 });
   const [submitting, setSubmitting] = useState(false);
   const [submitSuccess, setSubmitSuccess] = useState(null);
+  const [copied, setCopied] = useState(false);
+
+  // Generate class meeting link
+  const classLink = `https://meet.google.com/${id.substring(0, 3)}-${id.substring(3, 7)}-${id.substring(7, 10)}`;
+
+  const copyClassLink = () => {
+    navigator.clipboard.writeText(classLink);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
 
   useEffect(() => {
     const fetchClassDetails = async () => {
@@ -87,7 +98,7 @@ const MyEnrollClassDetails = () => {
     formData.append('file', file);
     formData.append('assignmentId', assignmentId);
 
-    formData.append('userId', userId); 
+    formData.append('userId', userId);
 
     try {
       const response = await fetch(`https://edumanagebackend.vercel.app/assignments/${assignmentId}/submit`, {
@@ -116,17 +127,17 @@ const MyEnrollClassDetails = () => {
       setSubmitSuccess("Please provide both a description and rating");
       return;
     }
-    
+
     setSubmitting(true);
     try {
       const res = await fetch('https://edumanagebackend.vercel.app/users');
       const users = await res.json();
       const userId = users.find((u) => u.email === user?.email)?.uid;
-      
+
       if (!userId) {
         throw new Error('User not found');
       }
-      
+
       const response = await fetch(`https://edumanagebackend.vercel.app/classes/${id}/evaluate`, {
         method: 'POST',
         headers: {
@@ -192,7 +203,7 @@ const MyEnrollClassDetails = () => {
     const now = new Date();
     const deadlineDate = new Date(deadline);
     const daysLeft = Math.ceil((deadlineDate - now) / (1000 * 60 * 60 * 24));
-    
+
     if (daysLeft < 0) return { status: 'overdue', color: 'red', text: 'Overdue' };
     if (daysLeft === 0) return { status: 'today', color: 'orange', text: 'Due Today' };
     if (daysLeft <= 3) return { status: 'urgent', color: 'yellow', text: `${daysLeft} days left` };
@@ -217,8 +228,8 @@ const MyEnrollClassDetails = () => {
         <Card className="border-none shadow-sm bg-white dark:bg-gray-900/50 backdrop-blur-xl overflow-hidden">
           <div className="relative h-48 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600">
             {classDetails?.image && (
-              <img 
-                src={classDetails.image} 
+              <img
+                src={classDetails.image}
                 alt={classDetails.title}
                 className="absolute inset-0 w-full h-full object-cover opacity-30"
               />
@@ -287,8 +298,8 @@ const MyEnrollClassDetails = () => {
                         </span>
                       </div>
                     </div>
-                    <Button 
-                      onClick={handleEvaluationSubmit} 
+                    <Button
+                      onClick={handleEvaluationSubmit}
                       className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
                       disabled={!evaluation.description.trim() || evaluation.rating === 0 || submitting}
                     >
@@ -322,6 +333,46 @@ const MyEnrollClassDetails = () => {
           </Alert>
         </FadeIn>
       )}
+
+      {/* Class Link Section - Top of Assignment Area */}
+      <FadeIn delay={0.15}>
+        <Card className="border-none shadow-sm bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 backdrop-blur-xl">
+          <CardContent className="p-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 flex-shrink-0">
+                  <Link2 className="w-5 h-5 text-white" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">Class Link</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{classLink}</p>
+                </div>
+              </div>
+              <Button
+                onClick={copyClassLink}
+                variant="outline"
+                size="sm"
+                className={`flex-shrink-0 transition-all duration-200 ${copied
+                  ? 'bg-green-50 border-green-500 text-green-600 dark:bg-green-900/20 dark:border-green-400 dark:text-green-400'
+                  : 'hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-600 dark:hover:bg-indigo-900/20'
+                  }`}
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-4 h-4 mr-1" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 mr-1" />
+                    Copy Link
+                  </>
+                )}
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </FadeIn>
 
       {/* Assignments Section */}
       <FadeIn delay={0.2}>
@@ -371,22 +422,21 @@ const MyEnrollClassDetails = () => {
                                   {assignment.description}
                                 </p>
                               </div>
-                              <Badge className={`ml-2 flex-shrink-0 ${
-                                deadlineInfo.status === 'overdue' ? 'bg-red-500 text-white' :
+                              <Badge className={`ml-2 flex-shrink-0 ${deadlineInfo.status === 'overdue' ? 'bg-red-500 text-white' :
                                 deadlineInfo.status === 'today' ? 'bg-orange-500 text-white' :
-                                deadlineInfo.status === 'urgent' ? 'bg-yellow-500 text-white' :
-                                'bg-green-500 text-white'
-                              } border-none`}>
+                                  deadlineInfo.status === 'urgent' ? 'bg-yellow-500 text-white' :
+                                    'bg-green-500 text-white'
+                                } border-none`}>
                                 {deadlineInfo.text}
                               </Badge>
                             </div>
-                            
+
                             <div className="flex flex-wrap items-center gap-4 mt-3">
                               <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
                                 <Calendar className="w-4 h-4" />
-                                <span>Due: {new Date(assignment.deadline).toLocaleDateString('en-US', { 
-                                  month: 'short', 
-                                  day: 'numeric', 
+                                <span>Due: {new Date(assignment.deadline).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric',
                                   year: 'numeric',
                                   hour: '2-digit',
                                   minute: '2-digit'
@@ -403,8 +453,8 @@ const MyEnrollClassDetails = () => {
                           <div className="flex flex-col gap-2 lg:w-64">
                             <label className="relative cursor-pointer">
                               <div className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed transition-all
-                                ${selectedFile[assignment._id] 
-                                  ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300' 
+                                ${selectedFile[assignment._id]
+                                  ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
                                   : 'border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                                 }`}
                               >
@@ -413,12 +463,12 @@ const MyEnrollClassDetails = () => {
                                   {selectedFile[assignment._id] ? selectedFile[assignment._id].name.substring(0, 20) + '...' : 'Choose File'}
                                 </span>
                               </div>
-                              <Input 
-                                type="file" 
+                              <Input
+                                type="file"
                                 className="hidden"
                                 onChange={(e) => {
                                   if (e.target.files[0]) {
-                                    setSelectedFile({...selectedFile, [assignment._id]: e.target.files[0]});
+                                    setSelectedFile({ ...selectedFile, [assignment._id]: e.target.files[0] });
                                   }
                                 }}
                                 disabled={submitting}
