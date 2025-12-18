@@ -9,12 +9,12 @@ import toast from 'react-hot-toast';
 
 export default function TeachForm() {
   const { user } = useContext(AuthContext);
-  const { 
-    register, 
+  const {
+    register,
     control,
-    reset, 
-    handleSubmit, 
-    formState: { errors, isSubmitting } 
+    reset,
+    handleSubmit,
+    formState: { errors, isSubmitting }
   } = useForm({
     defaultValues: {
       instructorName: user?.displayName || '',
@@ -83,7 +83,7 @@ export default function TeachForm() {
             Class Image URL
           </label>
           <Input
-            {...register('imageUrl', { 
+            {...register('imageUrl', {
               required: 'Class image URL is required',
               pattern: {
                 value: /^https?:\/\/.+\.(jpg|jpeg|png|gif|webp)$/i,
@@ -98,9 +98,9 @@ export default function TeachForm() {
           )}
           {/* Preview Image */}
           {register('imageUrl')?.value && (
-            <img 
-              src={register('imageUrl').value} 
-              alt="Class Preview" 
+            <img
+              src={register('imageUrl').value}
+              alt="Class Preview"
               className="mt-4 h-64 w-full object-cover rounded-lg shadow-lg"
             />
           )}
@@ -112,7 +112,7 @@ export default function TeachForm() {
             Class Title
           </label>
           <Input
-            {...register('title', { 
+            {...register('title', {
               required: 'Class title is required',
               minLength: { value: 5, message: 'Title must be at least 5 characters' }
             })}
@@ -132,7 +132,7 @@ export default function TeachForm() {
           <Controller
             name="description"
             control={control}
-            rules={{ 
+            rules={{
               required: 'Description is required',
               minLength: { value: 20, message: 'Description must be at least 20 characters' }
             }}

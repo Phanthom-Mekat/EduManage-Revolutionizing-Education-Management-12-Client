@@ -31,6 +31,7 @@ import PerformanceAnalytics from "@/components/studentdashboard/PerformanceAnaly
 import NotificationsCenter from "@/components/studentdashboard/NotificationsCenter";
 import FlashcardGenerator from "@/components/studentdashboard/FlashcardGenerator";
 import AchievementSystem from "@/components/studentdashboard/AchievementSystem";
+import AssignmentsPage from "@/components/studentdashboard/AssignmentsPage";
 import UIShowcasePage from "@/pages/UIShowcasePage";
 
 const router = createBrowserRouter([
@@ -44,23 +45,23 @@ const router = createBrowserRouter([
             },
             {
                 path: '/all-classes',
-                element: <AllClasses/>,
+                element: <AllClasses />,
             },
             {
                 path: '/all-classes/:id',
-                element: <PrivateRouter><ClassDetailsEnroll/></PrivateRouter>
+                element: <PrivateRouter><ClassDetailsEnroll /></PrivateRouter>
             },
             {
                 path: '/payment/:id',
-                element: <PrivateRouter><PaymentPage/></PrivateRouter>
+                element: <PrivateRouter><PaymentPage /></PrivateRouter>
             },
             {
                 path: '/teach',
-                element: <PrivateRouter><TeachForm/></PrivateRouter>
+                element: <PrivateRouter><TeachForm /></PrivateRouter>
             },
             {
                 path: '/ui-showcase',
-                element: <UIShowcasePage/>
+                element: <UIShowcasePage />
             }
 
         ]
@@ -79,95 +80,99 @@ const router = createBrowserRouter([
                 element: <Register />
             }
         ]
-    },{
-        path:'dashboard',
-        element:<PrivateRouter><DashboardLayout/></PrivateRouter> ,
-        children:[
+    }, {
+        path: 'dashboard',
+        element: <PrivateRouter><DashboardLayout /></PrivateRouter>,
+        children: [
             {
-                path:'my-enroll-class',
-                element:<PrivateRouter><MyEnrollClass/></PrivateRouter>
-            },{
-                path:'myenroll-class/:id',
-                element:<PrivateRouter><MyEnrollClassDetails/></PrivateRouter>
+                path: 'my-enroll-class',
+                element: <PrivateRouter><MyEnrollClass /></PrivateRouter>
+            }, {
+                path: 'myenroll-class/:id',
+                element: <PrivateRouter><MyEnrollClassDetails /></PrivateRouter>
             },
             {
-                path:'profile',
-                element:<PrivateRouter><MyProfile/></PrivateRouter>
+                path: 'profile',
+                element: <PrivateRouter><MyProfile /></PrivateRouter>
             },
             {
-                path:'quiz-generator',
-                element:<PrivateRouter><InteractiveQuizGenerator/></PrivateRouter>
+                path: 'assignments',
+                element: <PrivateRouter><AssignmentsPage /></PrivateRouter>
             },
             {
-                path:'ai-study-buddy',
-                element:<PrivateRouter><AIStudyBuddy/></PrivateRouter>
+                path: 'quiz-generator',
+                element: <PrivateRouter><InteractiveQuizGenerator /></PrivateRouter>
             },
             {
-                path:'analytics',
-                element:<PrivateRouter><PerformanceAnalytics/></PrivateRouter>
+                path: 'ai-study-buddy',
+                element: <PrivateRouter><AIStudyBuddy /></PrivateRouter>
             },
             {
-                path:'flashcards',
-                element:<PrivateRouter><FlashcardGenerator/></PrivateRouter>
+                path: 'analytics',
+                element: <PrivateRouter><PerformanceAnalytics /></PrivateRouter>
             },
             {
-                path:'achievements',
-                element:<PrivateRouter><AchievementSystem/></PrivateRouter>
+                path: 'flashcards',
+                element: <PrivateRouter><FlashcardGenerator /></PrivateRouter>
             },
             {
-                path:'notifications',
-                element:<PrivateRouter><NotificationsCenter/></PrivateRouter>
+                path: 'achievements',
+                element: <PrivateRouter><AchievementSystem /></PrivateRouter>
+            },
+            {
+                path: 'notifications',
+                element: <PrivateRouter><NotificationsCenter /></PrivateRouter>
             }
         ]
-    },{
+    }, {
         path: 'admin',
-        element: <PrivateRouter><AdminDashboardLayout/></PrivateRouter>,
+        element: <PrivateRouter><AdminDashboardLayout /></PrivateRouter>,
         children: [
             {
                 path: 'teacher-request',
-                element: <PrivateRouter><TeacherRequest/></PrivateRouter>
+                element: <PrivateRouter><TeacherRequest /></PrivateRouter>
             },
             {
                 path: 'users',
-                element: <PrivateRouter><Users/></PrivateRouter>
-            },{
-                path:'all-classes',
-                element:<PrivateRouter><AllClassesAdmin/></PrivateRouter>
-            },{
-                path:'profile',
-                element:<PrivateRouter><AdminProfile/></PrivateRouter>
+                element: <PrivateRouter><Users /></PrivateRouter>
+            }, {
+                path: 'all-classes',
+                element: <PrivateRouter><AllClassesAdmin /></PrivateRouter>
+            }, {
+                path: 'profile',
+                element: <PrivateRouter><AdminProfile /></PrivateRouter>
             }
         ]
-    },{
-        path:'teacher',
-        element:  <PrivateRouter><TeacherDashBoardLayout/></PrivateRouter> ,
-        children:[{
-            path:'addclass',
-            element:<PrivateRouter><AddClass/></PrivateRouter>
+    }, {
+        path: 'teacher',
+        element: <PrivateRouter><TeacherDashBoardLayout /></PrivateRouter>,
+        children: [{
+            path: 'addclass',
+            element: <PrivateRouter><AddClass /></PrivateRouter>
         },
         {
-            path:'my-classes',
-            element:<PrivateRouter><MyClasses/></PrivateRouter>
+            path: 'my-classes',
+            element: <PrivateRouter><MyClasses /></PrivateRouter>
         },
         {
-            path:'my-classes/:id',
-            element:<PrivateRouter><ClassDetails/></PrivateRouter>  ,
-            loader:({params})=>fetch(`https://edumanagebackend.vercel.app/classes/${params.id}`)
+            path: 'my-classes/:id',
+            element: <PrivateRouter><ClassDetails /></PrivateRouter>,
+            loader: ({ params }) => fetch(`https://edumanagebackend.vercel.app/classes/${params.id}`)
         },
         {
-            path:'ai-lecture-notes',
-            element:<PrivateRouter><AILectureNotesGenerator/></PrivateRouter>
+            path: 'ai-lecture-notes',
+            element: <PrivateRouter><AILectureNotesGenerator /></PrivateRouter>
         },
         {
-            path:'profile',
-            element:<PrivateRouter><TeacherProfile/></PrivateRouter>
+            path: 'profile',
+            element: <PrivateRouter><TeacherProfile /></PrivateRouter>
         }
-    
-    ]
+
+        ]
     },
     {
         path: '*',
-        element: <ErrorPage/>
+        element: <ErrorPage />
     }
 ])
 

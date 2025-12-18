@@ -101,8 +101,8 @@ const Navbar = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
             className={`${scrolled
-                    ? "bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-lg"
-                    : "bg-white dark:bg-gray-900"
+                ? "bg-white/90 dark:bg-gray-900/90 backdrop-blur-md shadow-lg"
+                : "bg-white dark:bg-gray-900"
                 } sticky top-0 z-50 transition-all duration-300`}
         >
             <div className="navbar container mx-auto px-4 py-3">

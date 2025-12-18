@@ -5,10 +5,10 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { motion, AnimatePresence } from "framer-motion"
-import { 
-  Upload, 
-  FileText, 
-  Presentation, 
+import {
+  Upload,
+  FileText,
+  Presentation,
   Brain,
   Download,
   Sparkles,
@@ -19,11 +19,18 @@ import {
   Loader2,
   FileAudio,
   Copy,
-  AlertCircle
+  AlertCircle,
+  ChevronLeft,
+  ChevronRight,
+  Maximize2
 } from "lucide-react"
 import toast from "react-hot-toast"
 import { useDropzone } from "react-dropzone"
-import { generateLectureNotes, generateSlides, generateMindMap } from "@/lib/groq-ai"
+import ReactMarkdown from "react-markdown"
+import remarkGfm from "remark-gfm"
+import { generateLectureNotes, generateSlides, generateMindMap } from "@/lib/gemini-ai"
+import pptxgen from "pptxgenjs"
+import MindMapVisualization from "./MindMapVisualization"
 
 const AILectureNotesGenerator = () => {
   const [activeTab, setActiveTab] = useState("upload")
@@ -35,6 +42,80 @@ const AILectureNotesGenerator = () => {
   const [generatedSlides, setGeneratedSlides] = useState(null)
   const [generatedMindMap, setGeneratedMindMap] = useState(null)
   const [activeOutput, setActiveOutput] = useState("notes")
+  const [currentSlide, setCurrentSlide] = useState(0)
+
+  // Export slides to PPTX
+  const exportToPPTX = () => {
+    if (!generatedSlides || !generatedSlides.slides) {
+      toast.error("No slides to export")
+      return
+    }
+
+    try {
+      const pptx = new pptxgen()
+      pptx.layout = "LAYOUT_16x9"
+      pptx.title = generatedSlides.title || "AI Generated Presentation"
+      pptx.author = "EduManage AI"
+
+      generatedSlides.slides.forEach((slideData, index) => {
+        const slide = pptx.addSlide()
+
+        // Add solid background
+        slide.background = {
+          color: index === 0 ? "2563eb" : "0f172a" // blue-600 : slate-900
+        }
+
+        // Title slide styling
+        if (index === 0 || slideData.type === "title") {
+          slide.addText(slideData.title || `Slide ${slideData.slideNumber}`, {
+            x: 0.5, y: 2, w: "90%", h: 1.5,
+            fontSize: 44, bold: true, color: "FFFFFF",
+            align: "center", fontFace: "Arial"
+          })
+          if (slideData.subtitle) {
+            slide.addText(slideData.subtitle, {
+              x: 0.5, y: 3.5, w: "90%", h: 0.8,
+              fontSize: 24, color: "94a3b8",
+              align: "center", fontFace: "Arial"
+            })
+          }
+        } else {
+          // Content slide styling
+          slide.addText(slideData.title || `Slide ${slideData.slideNumber}`, {
+            x: 0.5, y: 0.3, w: "90%", h: 0.8,
+            fontSize: 32, bold: true, color: "FFFFFF",
+            fontFace: "Arial"
+          })
+
+          // Add content bullets
+          if (slideData.content && slideData.content.length > 0) {
+            const bulletPoints = slideData.content.map(item => ({
+              text: item.replace(/^[•\-]\s*/, ""),
+              options: { bullet: true, color: "e2e8f0" }
+            }))
+
+            slide.addText(bulletPoints, {
+              x: 0.5, y: 1.3, w: "90%", h: 3.5,
+              fontSize: 20, color: "e2e8f0",
+              fontFace: "Arial", valign: "top",
+              lineSpacingMultiple: 1.5
+            })
+          }
+        }
+
+        // Add speaker notes if available
+        if (slideData.speakerNotes || slideData.notes) {
+          slide.addNotes(slideData.speakerNotes || slideData.notes)
+        }
+      })
+
+      pptx.writeFile({ fileName: `${generatedSlides.title || "presentation"}.pptx` })
+      toast.success("PowerPoint downloaded successfully!")
+    } catch (error) {
+      console.error("PPTX export error:", error)
+      toast.error("Failed to export PowerPoint")
+    }
+  }
 
   // Dropzone for file upload
   const onDrop = useCallback((acceptedFiles) => {
@@ -68,7 +149,7 @@ const AILectureNotesGenerator = () => {
       // In a real implementation, you would transcribe the audio/video first
       // For now, we'll use the filename as context for AI generation
       const transcript = `This is a lecture about ${uploadedFile.name.replace(/\.[^/.]+$/, "").replace(/[-_]/g, " ")}. The content covers educational concepts and teaching methodologies.`;
-      
+
       const notes = await generateLectureNotes(uploadedFile.name, transcript);
       setGeneratedNotes(notes);
       toast.success("Notes generated successfully with AI!");
@@ -152,15 +233,15 @@ const AILectureNotesGenerator = () => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
-        <Card className="border-none shadow-sm bg-gradient-to-br from-purple-50 via-pink-50 to-orange-50 dark:from-gray-900/50 dark:via-gray-800/50 dark:to-gray-900/50 backdrop-blur-xl">
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center shadow-lg shadow-purple-500/30">
-                <Sparkles className="w-6 h-6 text-white" />
+        <Card className="border-none shadow-none bg-transparent">
+          <CardContent className="p-0">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <Brain className="w-7 h-7 text-white" />
               </div>
               <div>
-                <h2 className="text-3xl font-bold text-gray-900 dark:text-white">
-                  AI Lecture Notes Generator
+                <h2 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                  LECTURE<span className="text-blue-600">NOTES</span>
                 </h2>
                 <p className="text-gray-600 dark:text-gray-400">
                   Transform your lectures into structured notes, slides, and mind maps
@@ -172,27 +253,28 @@ const AILectureNotesGenerator = () => {
       </motion.div>
 
       {/* Tab Navigation */}
-      <div className="flex gap-2 flex-wrap">
+      {/* Tab Navigation */}
+      <div className="flex gap-2 p-1 bg-slate-100 dark:bg-slate-800/50 rounded-xl w-fit">
         <Button
-          variant={activeTab === "upload" ? "default" : "outline"}
+          variant="ghost"
           onClick={() => setActiveTab("upload")}
-          className={activeTab === "upload" ? "bg-gradient-to-r from-purple-600 to-pink-600" : ""}
+          className={`rounded-lg transition-all duration-300 ${activeTab === "upload" ? "bg-white dark:bg-slate-800 text-blue-600 shadow-sm font-bold" : "text-slate-500 hover:text-slate-700"}`}
         >
           <Video className="w-4 h-4 mr-2" />
           Media to Notes
         </Button>
         <Button
-          variant={activeTab === "slides" ? "default" : "outline"}
+          variant="ghost"
           onClick={() => setActiveTab("slides")}
-          className={activeTab === "slides" ? "bg-gradient-to-r from-blue-600 to-cyan-600" : ""}
+          className={`rounded-lg transition-all duration-300 ${activeTab === "slides" ? "bg-white dark:bg-slate-800 text-blue-600 shadow-sm font-bold" : "text-slate-500 hover:text-slate-700"}`}
         >
           <Presentation className="w-4 h-4 mr-2" />
           Generate Slides
         </Button>
         <Button
-          variant={activeTab === "mindmap" ? "default" : "outline"}
+          variant="ghost"
           onClick={() => setActiveTab("mindmap")}
-          className={activeTab === "mindmap" ? "bg-gradient-to-r from-green-600 to-teal-600" : ""}
+          className={`rounded-lg transition-all duration-300 ${activeTab === "mindmap" ? "bg-white dark:bg-slate-800 text-blue-600 shadow-sm font-bold" : "text-slate-500 hover:text-slate-700"}`}
         >
           <Brain className="w-4 h-4 mr-2" />
           Create Mind Map
@@ -215,14 +297,13 @@ const AILectureNotesGenerator = () => {
                   className="space-y-4"
                 >
                   <h3 className="text-xl font-semibold mb-4">Upload Audio/Video</h3>
-                  
+
                   <div
                     {...getRootProps()}
-                    className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
-                      isDragActive
-                        ? "border-purple-500 bg-purple-50 dark:bg-purple-900/20"
-                        : "border-gray-300 dark:border-gray-700 hover:border-purple-400"
-                    }`}
+                    className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${isDragActive
+                      ? "border-blue-500 bg-blue-50 dark:bg-blue-900/20"
+                      : "border-slate-200 dark:border-slate-800 hover:border-blue-400"
+                      }`}
                   >
                     <input {...getInputProps()} />
                     <div className="flex flex-col items-center gap-3">
@@ -250,7 +331,7 @@ const AILectureNotesGenerator = () => {
                       ) : (
                         <>
                           {isDragActive ? (
-                            <Upload className="w-12 h-12 text-purple-500 animate-bounce" />
+                            <Upload className="w-12 h-12 text-blue-500 animate-bounce" />
                           ) : (
                             <div className="flex gap-4">
                               <Video className="w-12 h-12 text-gray-400" />
@@ -271,7 +352,7 @@ const AILectureNotesGenerator = () => {
                   <Button
                     onClick={processMediaToNotes}
                     disabled={processing || !uploadedFile}
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                    className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20"
                   >
                     {processing ? (
                       <>
@@ -298,7 +379,7 @@ const AILectureNotesGenerator = () => {
                   className="space-y-4"
                 >
                   <h3 className="text-xl font-semibold mb-4">Course Outline</h3>
-                  
+
                   <div className="space-y-3">
                     <Label htmlFor="outline">Enter your course outline or topics</Label>
                     <Textarea
@@ -314,7 +395,7 @@ const AILectureNotesGenerator = () => {
                   <Button
                     onClick={generateSlidesFromOutline}
                     disabled={processing || !courseOutline.trim()}
-                    className="w-full bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
+                    className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20"
                   >
                     {processing ? (
                       <>
@@ -341,7 +422,7 @@ const AILectureNotesGenerator = () => {
                   className="space-y-4"
                 >
                   <h3 className="text-xl font-semibold mb-4">Course Content</h3>
-                  
+
                   <div className="space-y-3">
                     <Label htmlFor="content">Enter your course content or key concepts</Label>
                     <Textarea
@@ -357,7 +438,7 @@ const AILectureNotesGenerator = () => {
                   <Button
                     onClick={generateMindMapFromContent}
                     disabled={processing || !courseContent.trim()}
-                    className="w-full bg-gradient-to-r from-green-600 to-teal-600 hover:from-green-700 hover:to-teal-700"
+                    className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20"
                   >
                     {processing ? (
                       <>
@@ -390,7 +471,7 @@ const AILectureNotesGenerator = () => {
                     onClick={() => {
                       let content = ""
                       let filename = "output.txt"
-                      
+
                       if (activeOutput === "notes" && generatedNotes) {
                         content = generatedNotes.detailedNotes
                         filename = "lecture-notes.md"
@@ -401,7 +482,7 @@ const AILectureNotesGenerator = () => {
                         content = JSON.stringify(generatedMindMap, null, 2)
                         filename = "mindmap.json"
                       }
-                      
+
                       copyToClipboard(content)
                     }}
                   >
@@ -413,7 +494,7 @@ const AILectureNotesGenerator = () => {
                     onClick={() => {
                       let content = ""
                       let filename = "output.txt"
-                      
+
                       if (activeOutput === "notes" && generatedNotes) {
                         content = generatedNotes.detailedNotes
                         filename = "lecture-notes.md"
@@ -424,7 +505,7 @@ const AILectureNotesGenerator = () => {
                         content = JSON.stringify(generatedMindMap, null, 2)
                         filename = "mindmap.json"
                       }
-                      
+
                       downloadContent(content, filename)
                     }}
                   >
@@ -443,7 +524,7 @@ const AILectureNotesGenerator = () => {
                   exit={{ opacity: 0 }}
                   className="space-y-4"
                 >
-                  <div className="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-gray-800 dark:to-gray-900 rounded-lg p-4">
+                  <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-6 border border-slate-200 dark:border-slate-800">
                     <h4 className="font-bold text-lg mb-2">{generatedNotes.title}</h4>
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-3">
                       {generatedNotes.summary}
@@ -463,10 +544,10 @@ const AILectureNotesGenerator = () => {
                     </ul>
                   </div>
 
-                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 max-h-96 overflow-y-auto">
-                    <pre className="text-xs whitespace-pre-wrap font-mono">
+                  <div className="bg-gray-50 dark:bg-gray-800 rounded-lg p-4 max-h-96 overflow-y-auto prose prose-sm dark:prose-invert max-w-none">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
                       {generatedNotes.detailedNotes}
-                    </pre>
+                    </ReactMarkdown>
                   </div>
                 </motion.div>
               )}
@@ -479,32 +560,142 @@ const AILectureNotesGenerator = () => {
                   exit={{ opacity: 0 }}
                   className="space-y-4"
                 >
-                  <div className="bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-gray-800 dark:to-gray-900 rounded-lg p-4">
-                    <h4 className="font-bold text-lg mb-2">{generatedSlides.title}</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">
-                      📊 {generatedSlides.totalSlides} slides generated
-                    </p>
+                  {/* Header with export button */}
+                  <div className="flex items-center justify-between">
+                    <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-4 border border-slate-200 dark:border-slate-800 flex-1">
+                      <h4 className="font-bold text-lg mb-1">{generatedSlides.title}</h4>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        📊 {generatedSlides.totalSlides || generatedSlides.slides?.length} slides generated
+                      </p>
+                    </div>
+                    <Button
+                      onClick={exportToPPTX}
+                      className="ml-4 bg-blue-600 hover:bg-blue-700 text-white"
+                    >
+                      <Download className="w-4 h-4 mr-2" />
+                      Export PPTX
+                    </Button>
                   </div>
 
-                  <div className="space-y-3 max-h-96 overflow-y-auto">
-                    {generatedSlides.slides.map((slide) => (
-                      <div
-                        key={slide.slideNumber}
-                        className="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg p-4 hover:shadow-md transition-shadow"
-                      >
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200 px-2 py-1 rounded text-xs font-semibold">
-                            Slide {slide.slideNumber}
-                          </span>
-                          <h5 className="font-semibold text-sm">{slide.title}</h5>
-                        </div>
-                        <ul className="list-disc list-inside text-sm space-y-1 mb-2">
-                          {slide.content.map((item, idx) => (
-                            <li key={idx} className="text-gray-700 dark:text-gray-300">{item}</li>
-                          ))}
-                        </ul>
-                        <p className="text-xs text-gray-500 italic">💡 {slide.notes}</p>
+                  {/* Visual Slide Preview */}
+                  <div className="relative">
+                    {/* Slide Display - looks like a real PPT slide */}
+                    <div
+                      className="aspect-video rounded-xl overflow-hidden shadow-2xl border border-gray-200 dark:border-gray-700"
+                      style={{
+                        background: currentSlide === 0
+                          ? "#1e3a8a"
+                          : "#0f172a"
+                      }}
+                    >
+                      <div className="h-full flex flex-col justify-center p-8 md:p-12">
+                        {generatedSlides.slides[currentSlide] && (
+                          <>
+                            {/* Slide Title */}
+                            <h3 className={`font-bold text-white mb-4 ${currentSlide === 0 ? "text-3xl md:text-4xl text-center" : "text-2xl md:text-3xl"
+                              }`}>
+                              {generatedSlides.slides[currentSlide].title}
+                            </h3>
+
+                            {/* Subtitle for title slide */}
+                            {currentSlide === 0 && generatedSlides.slides[currentSlide].subtitle && (
+                              <p className="text-lg text-blue-200 text-center mt-2">
+                                {generatedSlides.slides[currentSlide].subtitle}
+                              </p>
+                            )}
+
+                            {/* Content bullets */}
+                            {currentSlide !== 0 && generatedSlides.slides[currentSlide].content && (
+                              <ul className="space-y-3 mt-4">
+                                {generatedSlides.slides[currentSlide].content.map((item, idx) => (
+                                  <motion.li
+                                    key={idx}
+                                    initial={{ opacity: 0, x: -20 }}
+                                    animate={{ opacity: 1, x: 0 }}
+                                    transition={{ delay: idx * 0.1 }}
+                                    className="flex items-start gap-3 text-gray-100 text-lg"
+                                  >
+                                    <span className="text-blue-400 mt-1">•</span>
+                                    <span>{item.replace(/^[•\-]\s*/, "")}</span>
+                                  </motion.li>
+                                ))}
+                              </ul>
+                            )}
+                          </>
+                        )}
                       </div>
+
+                      {/* Slide number indicator */}
+                      <div className="absolute bottom-4 right-4 bg-black/30 text-white px-3 py-1 rounded-full text-sm">
+                        {currentSlide + 1} / {generatedSlides.slides.length}
+                      </div>
+                    </div>
+
+                    {/* Navigation Controls */}
+                    <div className="flex items-center justify-center gap-4 mt-4">
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setCurrentSlide(prev => Math.max(0, prev - 1))}
+                        disabled={currentSlide === 0}
+                      >
+                        <ChevronLeft className="w-5 h-5" />
+                      </Button>
+
+                      <div className="flex gap-1">
+                        {generatedSlides.slides.map((_, idx) => (
+                          <button
+                            key={idx}
+                            onClick={() => setCurrentSlide(idx)}
+                            className={`w-2 h-2 rounded-full transition-all ${idx === currentSlide
+                              ? "bg-blue-600 w-6"
+                              : "bg-slate-200 dark:bg-slate-700 hover:bg-blue-400"
+                              }`}
+                          />
+                        ))}
+                      </div>
+
+                      <Button
+                        variant="outline"
+                        size="icon"
+                        onClick={() => setCurrentSlide(prev => Math.min(generatedSlides.slides.length - 1, prev + 1))}
+                        disabled={currentSlide === generatedSlides.slides.length - 1}
+                      >
+                        <ChevronRight className="w-5 h-5" />
+                      </Button>
+                    </div>
+
+                    {/* Speaker Notes */}
+                    {(generatedSlides.slides[currentSlide]?.speakerNotes || generatedSlides.slides[currentSlide]?.notes) && (
+                      <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+                        <h5 className="text-sm font-semibold text-gray-600 dark:text-gray-400 mb-2">
+                          💡 Speaker Notes
+                        </h5>
+                        <p className="text-sm text-gray-700 dark:text-gray-300">
+                          {generatedSlides.slides[currentSlide].speakerNotes || generatedSlides.slides[currentSlide].notes}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Slide Thumbnails */}
+                  <div className="grid grid-cols-5 md:grid-cols-8 gap-2 mt-4">
+                    {generatedSlides.slides.map((slide, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setCurrentSlide(idx)}
+                        className={`aspect-video rounded-md text-xs font-bold text-white flex items-center justify-center transition-all ${idx === currentSlide
+                          ? "ring-2 ring-blue-500 ring-offset-2 dark:ring-offset-gray-900"
+                          : "opacity-60 hover:opacity-100"
+                          }`}
+                        style={{
+                          background: idx === 0
+                            ? "#1e3a8a"
+                            : "#0f172a"
+                        }}
+                      >
+                        {idx + 1}
+                      </button>
                     ))}
                   </div>
                 </motion.div>
@@ -518,7 +709,7 @@ const AILectureNotesGenerator = () => {
                   exit={{ opacity: 0 }}
                   className="space-y-4"
                 >
-                  <div className="bg-gradient-to-br from-green-50 to-teal-50 dark:from-gray-800 dark:to-gray-900 rounded-lg p-4">
+                  <div className="bg-slate-50 dark:bg-slate-900 rounded-lg p-6 border border-slate-200 dark:border-slate-800">
                     <h4 className="font-bold text-lg mb-2 text-center">
                       🧠 {generatedMindMap.centralTopic}
                     </h4>
@@ -527,34 +718,8 @@ const AILectureNotesGenerator = () => {
                     </p>
                   </div>
 
-                  <div className="space-y-4 max-h-96 overflow-y-auto">
-                    {generatedMindMap.branches.map((branch) => (
-                      <div
-                        key={branch.id}
-                        className="bg-white dark:bg-gray-800 border dark:border-gray-700 rounded-lg p-4"
-                      >
-                        <h5 className="font-bold text-green-700 dark:text-green-400 mb-3">
-                          {branch.topic}
-                        </h5>
-                        <div className="space-y-3 pl-4">
-                          {branch.subtopics.map((subtopic) => (
-                            <div key={subtopic.id}>
-                              <h6 className="font-semibold text-sm text-gray-800 dark:text-gray-200 mb-1">
-                                • {subtopic.name}
-                              </h6>
-                              <ul className="list-disc list-inside pl-4 text-sm space-y-1">
-                                {subtopic.items.map((item, idx) => (
-                                  <li key={idx} className="text-gray-600 dark:text-gray-400">
-                                    {item}
-                                  </li>
-                                ))}
-                              </ul>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                  {/* Visual Mind Map */}
+                  <MindMapVisualization mindMapData={generatedMindMap} />
                 </motion.div>
               )}
 

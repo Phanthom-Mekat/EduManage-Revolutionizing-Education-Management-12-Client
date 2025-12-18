@@ -2,10 +2,10 @@ import { useState, useEffect, useContext } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { motion } from "framer-motion"
-import { 
-  TrendingUp, 
-  Target, 
-  Award, 
+import {
+  TrendingUp,
+  Target,
+  Award,
   Activity,
   BarChart3,
   CheckCircle,
@@ -15,18 +15,18 @@ import {
   Brain
 } from "lucide-react"
 import { AuthContext } from "@/provider/AuthProvider"
-import { 
-  BarChart, 
-  Bar, 
-  LineChart, 
-  Line, 
-  PieChart, 
-  Pie, 
+import {
+  BarChart,
+  Bar,
+  LineChart,
+  Line,
+  PieChart,
+  Pie,
   Cell,
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   Legend,
   RadarChart,
@@ -77,7 +77,7 @@ const PerformanceAnalytics = () => {
   const totalQuizzes = quizHistory.length
   const averageScore = quizHistory.reduce((acc, q) => acc + q.score, 0) / totalQuizzes || 0
   const highestScore = Math.max(...quizHistory.map(q => q.score), 0)
-  const improvementRate = quizHistory.length > 1 
+  const improvementRate = quizHistory.length > 1
     ? ((quizHistory[quizHistory.length - 1].score - quizHistory[0].score) / quizHistory[0].score * 100)
     : 0
 
@@ -220,18 +220,18 @@ const PerformanceAnalytics = () => {
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.2} />
                   <XAxis dataKey="date" stroke="#6b7280" />
                   <YAxis stroke="#6b7280" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1f2937', 
-                      border: 'none', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#1f2937',
+                      border: 'none',
                       borderRadius: '8px',
                       color: '#fff'
-                    }} 
+                    }}
                   />
-                  <Line 
-                    type="monotone" 
-                    dataKey="score" 
-                    stroke="url(#colorGradient)" 
+                  <Line
+                    type="monotone"
+                    dataKey="score"
+                    stroke="url(#colorGradient)"
                     strokeWidth={3}
                     dot={{ fill: '#3b82f6', r: 5 }}
                   />
@@ -332,13 +332,13 @@ const PerformanceAnalytics = () => {
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.2} />
                   <XAxis dataKey="title" stroke="#6b7280" />
                   <YAxis stroke="#6b7280" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#1f2937', 
-                      border: 'none', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#1f2937',
+                      border: 'none',
                       borderRadius: '8px',
                       color: '#fff'
-                    }} 
+                    }}
                   />
                   <Bar dataKey="progress" fill="url(#barGradient)" radius={[8, 8, 0, 0]} />
                   <defs>
@@ -370,14 +370,14 @@ const PerformanceAnalytics = () => {
               <div>
                 <h3 className="font-bold text-lg mb-2">AI Insights</h3>
                 <p className="text-sm opacity-90">
-                  {averageScore >= 85 
+                  {averageScore >= 85
                     ? "🎉 Excellent performance! You're mastering the material. Keep up the great work!"
                     : averageScore >= 70
-                    ? "👍 Good progress! Focus on your weaker subjects to boost your overall performance."
-                    : "💪 Keep practicing! Regular study sessions will help improve your scores."}
+                      ? "👍 Good progress! Focus on your weaker subjects to boost your overall performance."
+                      : "💪 Keep practicing! Regular study sessions will help improve your scores."}
                 </p>
                 <p className="text-sm opacity-90 mt-2">
-                  {improvementRate > 0 
+                  {improvementRate > 0
                     ? `📈 You've improved by ${improvementRate.toFixed(1)}% - trending upward!`
                     : "📊 Stay consistent with your studies to see improvement trends."}
                 </p>

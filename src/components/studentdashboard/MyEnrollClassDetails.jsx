@@ -1,17 +1,39 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Rating } from "react-simple-star-rating";
-import { Loader2, Upload, Calendar, FileText, CheckCircle, Star, ArrowLeft, AlertCircle, User, Link2, Copy, Check, ExternalLink } from "lucide-react";
+import {
+  Loader2,
+  Calendar,
+  FileText,
+  CheckCircle,
+  Star,
+  ArrowLeft,
+  AlertCircle,
+  User,
+  Link2,
+  Copy,
+  Check,
+  ExternalLink,
+  Award,
+  Clock,
+  Send,
+  FolderOpen,
+  Video,
+  Image,
+  Link as LinkIcon
+} from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthContext } from "@/provider/AuthProvider";
 import { motion } from "framer-motion";
 import PropTypes from 'prop-types';
+import axios from "axios";
+import toast from "react-hot-toast";
+import SubmitAssignmentModal from "./SubmitAssignmentModal";
 
 const FadeIn = ({ children, delay }) => (
   <motion.div
@@ -35,15 +57,24 @@ FadeIn.defaultProps = {
 const MyEnrollClassDetails = () => {
   const { user } = useContext(AuthContext);
   const { id } = useParams();
+  const navigate = useNavigate();
+
   const [classDetails, setClassDetails] = useState(null);
   const [assignments, setAssignments] = useState([]);
+  const [studentSubmissions, setStudentSubmissions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [isEvaluationOpen, setIsEvaluationOpen] = useState(false);
   const [evaluation, setEvaluation] = useState({ description: "", rating: 0 });
   const [submitting, setSubmitting] = useState(false);
-  const [submitSuccess, setSubmitSuccess] = useState(null);
   const [copied, setCopied] = useState(false);
+  const [resources, setResources] = useState([]);
+  const [loadingResources, setLoadingResources] = useState(true);
+
+  // Submit modal state
+  const [isSubmitModalOpen, setIsSubmitModalOpen] = useState(false);
+  const [selectedAssignment, setSelectedAssignment] = useState(null);
+  const [existingSubmission, setExistingSubmission] = useState(null);
 
   // Class meeting link
   const classLink = "https://meet.google.com/xjk-bfrn-cyw";
@@ -54,127 +85,107 @@ const MyEnrollClassDetails = () => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const fetchData = useCallback(async () => {
+    try {
+      // Get user ID
+      const usersRes = await axios.get('https://edumanagebackend.vercel.app/users');
+      const userId = usersRes.data.find(u => u.email === user?.email)?.uid;
+
+      const [classResponse, assignmentsResponse] = await Promise.all([
+        axios.get(`https://edumanagebackend.vercel.app/classes/${id}`),
+        axios.get(`https://edumanagebackend.vercel.app/classes/${id}/assignments`)
+      ]);
+
+      setClassDetails(classResponse.data);
+      setAssignments(assignmentsResponse.data.assignments || []);
+
+      // Fetch student's submissions
+      if (userId) {
+        const submissionsRes = await axios.get(`https://edumanagebackend.vercel.app/students/${userId}/submissions`);
+        setStudentSubmissions(submissionsRes.data.submissions || []);
+      }
+
+      // Fetch class resources
+      try {
+        setLoadingResources(true);
+        const resourcesRes = await axios.get(`https://edumanagebackend.vercel.app/classes/${id}/resources`);
+        setResources(resourcesRes.data.resources || []);
+      } finally {
+        setLoadingResources(false);
+      }
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [id, user?.email]);
+
+  const getResourceIcon = (type) => {
+    switch (type) {
+      case 'video': return <Video className="w-5 h-5" />;
+      case 'document': return <FileText className="w-5 h-5" />;
+      case 'image': return <Image className="w-5 h-5" />;
+      default: return <LinkIcon className="w-5 h-5" />;
+    }
+  };
 
   useEffect(() => {
-    const fetchClassDetails = async () => {
-      try {
-        const [classResponse, assignmentsResponse] = await Promise.all([
-          fetch(`https://edumanagebackend.vercel.app/classes/${id}`),
-          fetch(`https://edumanagebackend.vercel.app/classes/${id}/assignments`)
-        ]);
-
-        if (!classResponse.ok || !assignmentsResponse.ok) {
-          throw new Error('Failed to fetch class details');
-        }
-
-        const [classData, assignmentsData] = await Promise.all([
-          classResponse.json(),
-          assignmentsResponse.json()
-        ]);
-
-        setClassDetails(classData);
-        setAssignments(assignmentsData.assignments);
-      } catch (err) {
-        setError(err.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchClassDetails();
-  }, [id]);
-
-  const handleSubmit = async (assignmentId, file) => {
-    if (!file) {
-      setSubmitSuccess("Please select a file first");
-      return;
+    if (user?.email) {
+      fetchData();
     }
+  }, [fetchData, user?.email]);
 
-    setSubmitting(true);
-    const res = await fetch('https://edumanagebackend.vercel.app/users');
-    const users = await res.json();
-    const userId = users.find((u) => u.email === user?.email)?.uid;
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('assignmentId', assignmentId);
+  const getSubmissionForAssignment = (assignmentId) => {
+    return studentSubmissions.find(sub => sub.assignmentId === assignmentId);
+  };
 
-    formData.append('userId', userId);
+  const handleSubmitClick = (assignment) => {
+    setSelectedAssignment(assignment);
+    setExistingSubmission(getSubmissionForAssignment(assignment._id));
+    setIsSubmitModalOpen(true);
+  };
 
-    try {
-      const response = await fetch(`https://edumanagebackend.vercel.app/assignments/${assignmentId}/submit`, {
-        method: 'POST',
-        body: formData
-      });
-
-      if (!response.ok) throw new Error('Submission failed');
-
-      const updatedAssignments = assignments.map(assignment =>
-        assignment._id === assignmentId
-          ? { ...assignment, submissionCount: assignment.submissionCount + 1 }
-          : assignment
-      );
-      setAssignments(updatedAssignments);
-      setSubmitSuccess("Assignment submitted successfully!");
-    } catch (err) {
-      setSubmitSuccess("Failed to submit assignment: " + err.message);
-    } finally {
-      setSubmitting(false);
-    }
+  const handleSubmitSuccess = () => {
+    fetchData(); // Refresh data
+    toast.success("Assignment submitted successfully!");
   };
 
   const handleEvaluationSubmit = async () => {
     if (!evaluation.description.trim() || evaluation.rating === 0) {
-      setSubmitSuccess("Please provide both a description and rating");
+      toast.error("Please provide both a description and rating");
       return;
     }
 
     setSubmitting(true);
     try {
-      const res = await fetch('https://edumanagebackend.vercel.app/users');
-      const users = await res.json();
-      const userId = users.find((u) => u.email === user?.email)?.uid;
+      const usersRes = await axios.get('https://edumanagebackend.vercel.app/users');
+      const userId = usersRes.data.find(u => u.email === user?.email)?.uid;
 
-      if (!userId) {
-        throw new Error('User not found');
-      }
+      if (!userId) throw new Error('User not found');
 
-      const response = await fetch(`https://edumanagebackend.vercel.app/classes/${id}/evaluate`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          userId: userId,
-          name: user?.displayName || 'Anonymous',
-          photo: user?.photoURL || '',
-          rating: evaluation.rating,
-          description: evaluation.description.trim()
-        })
+      await axios.post(`https://edumanagebackend.vercel.app/classes/${id}/evaluate`, {
+        userId,
+        name: user?.displayName || 'Anonymous',
+        photo: user?.photoURL || '',
+        rating: evaluation.rating,
+        description: evaluation.description.trim()
       });
-
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.message || 'Failed to submit evaluation');
-      }
 
       setIsEvaluationOpen(false);
       setEvaluation({ description: "", rating: 0 });
-      setSubmitSuccess("Evaluation submitted successfully!");
+      toast.success("Evaluation submitted successfully!");
     } catch (err) {
-      setSubmitSuccess("Failed to submit evaluation: " + err.message);
+      toast.error(err.response?.data?.message || "Failed to submit evaluation");
     } finally {
       setSubmitting(false);
     }
   };
-
-  const navigate = useNavigate();
-  const [selectedFile, setSelectedFile] = useState({});
 
   if (loading) {
     return (
       <div className="flex flex-col justify-center items-center min-h-[400px] gap-4">
         <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-        <p className="text-gray-600 dark:text-gray-400 font-medium">Loading course details...</p>
+        <p className="text-slate-600 dark:text-slate-400 font-medium">Loading course details...</p>
       </div>
     );
   }
@@ -204,10 +215,16 @@ const MyEnrollClassDetails = () => {
     const deadlineDate = new Date(deadline);
     const daysLeft = Math.ceil((deadlineDate - now) / (1000 * 60 * 60 * 24));
 
-    if (daysLeft < 0) return { status: 'overdue', color: 'red', text: 'Overdue' };
-    if (daysLeft === 0) return { status: 'today', color: 'orange', text: 'Due Today' };
-    if (daysLeft <= 3) return { status: 'urgent', color: 'yellow', text: `${daysLeft} days left` };
-    return { status: 'normal', color: 'green', text: `${daysLeft} days left` };
+    if (daysLeft < 0) return { status: 'overdue', color: 'bg-red-500 text-white', text: 'Overdue', icon: <AlertCircle className="w-3 h-3" /> };
+    if (daysLeft === 0) return { status: 'today', color: 'bg-orange-500 text-white', text: 'Due Today', icon: <Clock className="w-3 h-3" /> };
+    if (daysLeft <= 3) return { status: 'urgent', color: 'bg-yellow-500 text-white', text: `${daysLeft} days left`, icon: <Clock className="w-3 h-3" /> };
+    return { status: 'normal', color: 'bg-green-500 text-white', text: `${daysLeft} days left`, icon: <CheckCircle className="w-3 h-3" /> };
+  };
+
+  const getSubmissionStatus = (submission) => {
+    if (!submission) return { label: "Not Submitted", color: "bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-300" };
+    if (submission.status === "graded") return { label: "Graded", color: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400" };
+    return { label: "Submitted", color: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400" };
   };
 
   return (
@@ -216,7 +233,7 @@ const MyEnrollClassDetails = () => {
       <FadeIn>
         <button
           onClick={() => navigate('/dashboard/my-enroll-class')}
-          className="inline-flex items-center gap-2 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors group"
+          className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-blue-600 transition-colors group"
         >
           <ArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
           <span className="font-medium">Back to My Courses</span>
@@ -225,16 +242,16 @@ const MyEnrollClassDetails = () => {
 
       {/* Course Header Card */}
       <FadeIn delay={0.1}>
-        <Card className="border-none shadow-sm bg-white dark:bg-gray-900/50 backdrop-blur-xl overflow-hidden">
-          <div className="relative h-48 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600">
+        <Card className="border-none shadow-sm bg-white dark:bg-slate-900/50 backdrop-blur-xl overflow-hidden">
+          <div className="relative h-48 bg-blue-600">
             {classDetails?.image && (
               <img
                 src={classDetails.image}
                 alt={classDetails.title}
-                className="absolute inset-0 w-full h-full object-cover opacity-30"
+                className="absolute inset-0 w-full h-full object-cover opacity-50 mix-blend-overlay"
               />
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-blue-900/60 to-transparent" />
             <div className="absolute bottom-6 left-6 right-6">
               <h1 className="text-3xl font-bold text-white mb-2">{classDetails?.title}</h1>
               <div className="flex items-center gap-4 text-white/90">
@@ -253,7 +270,7 @@ const MyEnrollClassDetails = () => {
             <div className="flex flex-wrap gap-3">
               <Dialog open={isEvaluationOpen} onOpenChange={setIsEvaluationOpen}>
                 <DialogTrigger asChild>
-                  <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white border-none shadow-lg shadow-blue-500/30">
+                  <Button className="bg-blue-600 hover:bg-blue-700 text-white border-none shadow-lg shadow-blue-600/30">
                     <Star className="w-4 h-4 mr-2" />
                     Teaching Evaluation Report (TER)
                   </Button>
@@ -300,7 +317,7 @@ const MyEnrollClassDetails = () => {
                     </div>
                     <Button
                       onClick={handleEvaluationSubmit}
-                      className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                      className="w-full bg-blue-600 hover:bg-blue-700"
                       disabled={!evaluation.description.trim() || evaluation.rating === 0 || submitting}
                     >
                       {submitting ? (
@@ -323,24 +340,13 @@ const MyEnrollClassDetails = () => {
         </Card>
       </FadeIn>
 
-      {/* Success/Error Alert */}
-      {submitSuccess && (
-        <FadeIn>
-          <Alert className={`${submitSuccess.includes('Failed') || submitSuccess.includes('Please') ? 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-900/20' : 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-900/20'}`}>
-            <AlertDescription className={submitSuccess.includes('Failed') || submitSuccess.includes('Please') ? 'text-red-800 dark:text-red-200' : 'text-green-800 dark:text-green-200'}>
-              {submitSuccess}
-            </AlertDescription>
-          </Alert>
-        </FadeIn>
-      )}
-
-      {/* Class Link Section - Top of Assignment Area */}
+      {/* Class Link Section */}
       <FadeIn delay={0.15}>
-        <Card className="border-none shadow-sm bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 backdrop-blur-xl">
+        <Card className="border-none shadow-sm bg-blue-50 dark:bg-blue-900/20 backdrop-blur-xl">
           <CardContent className="p-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20 shrink-0">
                   <Link2 className="w-5 h-5 text-white" />
                 </div>
                 <div className="min-w-0 flex-1">
@@ -351,7 +357,7 @@ const MyEnrollClassDetails = () => {
               <div className="flex items-center gap-2">
                 <Button
                   onClick={() => window.open(classLink, '_blank')}
-                  className="bg-indigo-600 hover:bg-indigo-700 text-white border-none transition-colors"
+                  className="bg-blue-600 hover:bg-blue-700 text-white border-none"
                   size="sm"
                 >
                   <ExternalLink className="w-4 h-4 mr-1" />
@@ -361,25 +367,74 @@ const MyEnrollClassDetails = () => {
                   onClick={copyClassLink}
                   variant="outline"
                   size="sm"
-                  className={`flex-shrink-0 transition-all duration-200 ${copied
+                  className={`shrink-0 transition-all duration-200 ${copied
                     ? 'bg-green-50 border-green-500 text-green-600 dark:bg-green-900/20 dark:border-green-400 dark:text-green-400'
-                    : 'hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-600 dark:hover:bg-indigo-900/20'
+                    : 'hover:bg-blue-100 dark:hover:bg-blue-900/30 hover:border-blue-200 hover:text-blue-600'
                     }`}
                 >
-                  {copied ? (
-                    <>
-                      <Check className="w-4 h-4 mr-1" />
-                      Copied!
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="w-4 h-4 mr-1" />
-                      Copy Link
-                    </>
-                  )}
+                  {copied ? <><Check className="w-4 h-4 mr-1" /> Copied!</> : <><Copy className="w-4 h-4 mr-1" /> Copy Link</>}
                 </Button>
               </div>
             </div>
+          </CardContent>
+        </Card>
+      </FadeIn>
+
+      {/* Resources Section */}
+      <FadeIn delay={0.18}>
+        <Card className="border-none shadow-sm bg-white dark:bg-gray-900/50 backdrop-blur-xl">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <FolderOpen className="w-5 h-5 text-blue-600" />
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">Class Resources</h3>
+              </div>
+              <Badge className="bg-blue-100 text-blue-700 border-none dark:bg-blue-900/30 dark:text-blue-300">{resources.length} Materials</Badge>
+            </div>
+
+            {loadingResources ? (
+              <div className="flex items-center justify-center py-6">
+                <div className="w-6 h-6 border-3 border-primary border-t-transparent rounded-full animate-spin" />
+              </div>
+            ) : resources.length === 0 ? (
+              <div className="text-center py-6">
+                <FolderOpen className="w-10 h-10 mx-auto text-gray-300 dark:text-gray-600 mb-2" />
+                <p className="text-sm text-gray-500 dark:text-gray-400">No resources shared yet</p>
+              </div>
+            ) : (
+              <div className="grid gap-2">
+                {resources.map((resource) => (
+                  <motion.div
+                    key={resource._id}
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="p-3 rounded-lg border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all bg-gray-50/50 dark:bg-gray-800/50 group"
+                  >
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/20 flex items-center justify-center shrink-0 text-blue-600">
+                          {getResourceIcon(resource.type)}
+                        </div>
+                        <div className="min-w-0 flex-1">
+                          <h4 className="font-medium text-gray-900 dark:text-white text-sm truncate">{resource.title}</h4>
+                          {resource.description && (
+                            <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-1">{resource.description}</p>
+                          )}
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        onClick={() => window.open(resource.url, '_blank')}
+                        className="bg-blue-50 text-blue-600 hover:bg-blue-100 dark:bg-blue-900/20 dark:text-blue-400 dark:hover:bg-blue-900/40 text-xs border-none"
+                      >
+                        <ExternalLink className="w-3 h-3 mr-1" />
+                        Open
+                      </Button>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       </FadeIn>
@@ -388,14 +443,15 @@ const MyEnrollClassDetails = () => {
       <FadeIn delay={0.2}>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-              <FileText className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+            <h2 className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+              <FileText className="w-6 h-6 text-blue-600" />
               Assignments
             </h2>
-            <Badge className="bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-none">
+            <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300 border-none">
               {assignments.length} Total
             </Badge>
           </div>
+
 
           {assignments.length === 0 ? (
             <Card className="border-none shadow-sm bg-white dark:bg-gray-900/50 backdrop-blur-xl">
@@ -411,6 +467,9 @@ const MyEnrollClassDetails = () => {
             <div className="grid gap-4">
               {assignments.map((assignment, index) => {
                 const deadlineInfo = getDeadlineStatus(assignment.deadline);
+                const submission = getSubmissionForAssignment(assignment._id);
+                const submissionStatus = getSubmissionStatus(submission);
+
                 return (
                   <motion.div
                     key={assignment._id}
@@ -418,97 +477,90 @@ const MyEnrollClassDetails = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <Card className="border-none shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-gray-900/50 backdrop-blur-xl group">
+                    <Card className="border-none shadow-sm hover:shadow-lg transition-all duration-300 bg-white dark:bg-slate-900/50 backdrop-blur-xl group border border-slate-100 dark:border-slate-800">
                       <CardContent className="p-6">
                         <div className="flex flex-col lg:flex-row lg:items-center gap-4">
                           {/* Assignment Info */}
                           <div className="flex-1">
                             <div className="flex items-start justify-between mb-2">
-                              <div>
-                                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-1 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
-                                  {assignment.title}
-                                </h3>
-                                <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                                  {assignment.description}
-                                </p>
+                              <div className="flex items-start gap-3">
+                                <div className="w-10 h-10 rounded-lg bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center shrink-0">
+                                  <FileText className="w-5 h-5 text-blue-600" />
+                                </div>
+                                <div>
+                                  <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-1 group-hover:text-blue-600 transition-colors">
+                                    {assignment.title}
+                                  </h3>
+                                  <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                                    {assignment.description}
+                                  </p>
+                                </div>
                               </div>
-                              <Badge className={`ml-2 flex-shrink-0 ${deadlineInfo.status === 'overdue' ? 'bg-red-500 text-white' :
-                                deadlineInfo.status === 'today' ? 'bg-orange-500 text-white' :
-                                  deadlineInfo.status === 'urgent' ? 'bg-yellow-500 text-white' :
-                                    'bg-green-500 text-white'
-                                } border-none`}>
-                                {deadlineInfo.text}
-                              </Badge>
                             </div>
 
-                            <div className="flex flex-wrap items-center gap-4 mt-3">
-                              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                <Calendar className="w-4 h-4" />
-                                <span>Due: {new Date(assignment.deadline).toLocaleDateString('en-US', {
-                                  month: 'short',
-                                  day: 'numeric',
-                                  year: 'numeric',
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}</span>
-                              </div>
-                              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-                                <CheckCircle className="w-4 h-4" />
-                                <span>{assignment.submissionCount || 0} submission{assignment.submissionCount !== 1 ? 's' : ''}</span>
-                              </div>
+                            <div className="flex flex-wrap items-center gap-3 mt-3">
+                              <Badge className={`${deadlineInfo.color} border-none flex items-center gap-1`}>
+                                {deadlineInfo.icon}
+                                {deadlineInfo.text}
+                              </Badge>
+                              <Badge className={`${submissionStatus.color} border-none`}>
+                                {submissionStatus.label}
+                              </Badge>
+                              <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                <Calendar className="w-3 h-3" />
+                                {new Date(assignment.deadline).toLocaleDateString()}
+                              </span>
+                              <span className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1">
+                                <Award className="w-3 h-3" />
+                                {assignment.maxPoints || 100} pts
+                              </span>
                             </div>
                           </div>
 
-                          {/* File Upload */}
-                          <div className="flex flex-col gap-2 lg:w-64">
-                            <label className="relative cursor-pointer">
-                              <div className={`flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border-2 border-dashed transition-all
-                                ${selectedFile[assignment._id]
-                                  ? 'border-green-500 bg-green-50 dark:bg-green-900/20 text-green-700 dark:text-green-300'
-                                  : 'border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 bg-gray-50 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
-                                }`}
-                              >
-                                <Upload className="w-4 h-4" />
-                                <span className="text-sm font-medium">
-                                  {selectedFile[assignment._id] ? selectedFile[assignment._id].name.substring(0, 20) + '...' : 'Choose File'}
-                                </span>
+                          {/* Grade & Submit */}
+                          <div className="flex items-center gap-4">
+                            {submission?.status === "graded" && (
+                              <div className="text-right">
+                                <div className="flex items-center gap-2">
+                                  <Award className="w-5 h-5 text-primary" />
+                                  <span className="text-2xl font-bold text-primary">
+                                    {submission.grade}
+                                  </span>
+                                  <span className="text-sm text-gray-500 dark:text-gray-400">
+                                    / {assignment.maxPoints || 100}
+                                  </span>
+                                </div>
+                                <p className="text-xs text-gray-500 dark:text-gray-400">
+                                  {((submission.grade / (assignment.maxPoints || 100)) * 100).toFixed(0)}%
+                                </p>
                               </div>
-                              <Input
-                                type="file"
-                                className="hidden"
-                                onChange={(e) => {
-                                  if (e.target.files[0]) {
-                                    setSelectedFile({ ...selectedFile, [assignment._id]: e.target.files[0] });
-                                  }
-                                }}
-                                disabled={submitting}
-                              />
-                            </label>
+                            )}
+
                             <Button
-                              onClick={() => {
-                                if (selectedFile[assignment._id]) {
-                                  handleSubmit(assignment._id, selectedFile[assignment._id]);
-                                } else {
-                                  setSubmitSuccess("Please select a file first");
-                                }
-                              }}
-                              disabled={submitting || !selectedFile[assignment._id]}
-                              className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                              onClick={() => handleSubmitClick(assignment)}
+                              className={submission
+                                ? "bg-slate-100 hover:bg-slate-200 text-slate-900 dark:bg-slate-800 dark:hover:bg-slate-700 dark:text-slate-100"
+                                : "bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-600/30"
+                              }
                             >
-                              {submitting ? (
-                                <>
-                                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                  Submitting...
-                                </>
-                              ) : (
-                                <>
-                                  <Upload className="w-4 h-4 mr-2" />
-                                  Submit Assignment
-                                </>
-                              )}
+                              <Send className="w-4 h-4 mr-2" />
+                              {submission ? "Update" : "Submit"}
                             </Button>
                           </div>
                         </div>
+
+                        {/* Feedback Display */}
+                        {submission?.feedback && (
+                          <div className="mt-4 pt-4 border-t border-gray-100 dark:border-gray-800">
+                            <div className="flex items-start gap-2 p-3 rounded-lg bg-green-50 dark:bg-green-900/20">
+                              <CheckCircle className="w-4 h-4 text-green-600 dark:text-green-400 mt-0.5 shrink-0" />
+                              <div>
+                                <p className="text-sm font-medium text-green-800 dark:text-green-300">Instructor Feedback</p>
+                                <p className="text-sm text-green-700 dark:text-green-400 mt-1">{submission.feedback}</p>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </CardContent>
                     </Card>
                   </motion.div>
@@ -518,6 +570,19 @@ const MyEnrollClassDetails = () => {
           )}
         </div>
       </FadeIn>
+
+      {/* Submit Assignment Modal */}
+      <SubmitAssignmentModal
+        isOpen={isSubmitModalOpen}
+        onClose={() => {
+          setIsSubmitModalOpen(false);
+          setSelectedAssignment(null);
+          setExistingSubmission(null);
+        }}
+        assignment={selectedAssignment}
+        existingSubmission={existingSubmission}
+        onSubmitSuccess={handleSubmitSuccess}
+      />
     </div>
   );
 };

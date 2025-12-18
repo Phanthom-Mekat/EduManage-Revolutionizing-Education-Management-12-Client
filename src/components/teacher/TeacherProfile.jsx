@@ -71,11 +71,11 @@ const TeacherProfile = () => {
           `https://edumanagebackend.vercel.app/classes?instructorEmail=${user?.email}`
         )
         const classes = response.data.classes || []
-        
+
         const totalStudents = classes.reduce((acc, cls) => acc + (cls.totalEnrollment || 0), 0)
         const totalAssignments = classes.reduce((acc, cls) => acc + (cls.totalAssignments || 0), 0)
-        const avgRating = classes.length > 0 
-          ? classes.reduce((acc, cls) => acc + (cls.averageRating || 0), 0) / classes.length 
+        const avgRating = classes.length > 0
+          ? classes.reduce((acc, cls) => acc + (cls.averageRating || 0), 0) / classes.length
           : 0
         const approvedClasses = classes.filter(cls => cls.status === 'approved').length
 
@@ -164,7 +164,7 @@ const TeacherProfile = () => {
           <div className="flex gap-2">
             {isEditing ? (
               <>
-                <Button 
+                <Button
                   variant="outline"
                   onClick={handleCancel}
                   disabled={loading}
@@ -173,7 +173,7 @@ const TeacherProfile = () => {
                   <X className="w-4 h-4" />
                   Cancel
                 </Button>
-                <Button 
+                <Button
                   onClick={handleSaveChanges}
                   disabled={loading}
                   className="gap-2 bg-gradient-to-r from-blue-600 to-purple-600 text-white border-none"
@@ -183,7 +183,7 @@ const TeacherProfile = () => {
                 </Button>
               </>
             ) : (
-              <Button 
+              <Button
                 variant="outline"
                 onClick={() => setIsEditing(true)}
                 className="gap-2"
@@ -263,7 +263,7 @@ const TeacherProfile = () => {
             ) : (
               <div className="flex flex-col md:flex-row items-center gap-8">
                 {/* Avatar with Glow */}
-                <motion.div 
+                <motion.div
                   className="relative"
                   whileHover={{ scale: 1.05 }}
                   transition={{ duration: 0.3 }}

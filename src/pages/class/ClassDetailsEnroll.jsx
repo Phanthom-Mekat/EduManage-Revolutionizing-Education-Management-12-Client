@@ -4,12 +4,12 @@ import axios from "axios"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { 
-  FiUsers, 
-  FiClock, 
-  FiStar, 
-  FiBookOpen, 
-  FiAward, 
+import {
+  FiUsers,
+  FiClock,
+  FiStar,
+  FiBookOpen,
+  FiAward,
   FiPlay,
   FiCheckCircle,
   FiArrowLeft
@@ -107,7 +107,7 @@ const ClassDetailsEnroll = () => {
                     alt={classDetails.title}
                     className="w-full h-full object-cover"
                   />
-                  
+
                   {/* Floating Badges */}
                   <div className="absolute top-6 left-6 z-20 flex gap-3">
                     <Badge className="px-4 py-2 bg-white/95 dark:bg-gray-900/95 backdrop-blur-md text-gray-900 dark:text-white border-none shadow-lg text-sm font-semibold">
@@ -129,14 +129,14 @@ const ClassDetailsEnroll = () => {
                     className="absolute inset-0 z-20 flex items-center justify-center"
                   >
                     <div className="w-20 h-20 rounded-full bg-white/90 dark:bg-gray-900/90 backdrop-blur-md flex items-center justify-center shadow-2xl">
-                      <FiPlay className="w-8 h-8 text-blue-600 dark:text-blue-400 ml-1" />
+                      <FiPlay className="w-8 h-8 text-blue-600 ml-1" />
                     </div>
                   </motion.button>
                 </div>
 
                 {/* Title & Instructor */}
                 <CardContent className="p-8">
-                  <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-6 leading-tight">
+                  <h1 className="text-4xl font-bold text-slate-900 dark:text-white mb-6 leading-tight">
                     {classDetails.title}
                   </h1>
 
@@ -194,13 +194,13 @@ const ClassDetailsEnroll = () => {
 
             {/* Description */}
             <FadeIn delay={0.2}>
-              <Card className="border-none shadow-lg bg-white dark:bg-gray-900/50 backdrop-blur-sm">
+              <Card className="border-none shadow-sm bg-white dark:bg-gray-900/50 backdrop-blur-sm">
                 <CardContent className="p-8">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4 flex items-center gap-3">
-                    <div className="w-1 h-8 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full" />
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-4 flex items-center gap-3">
+                    <div className="w-1 h-8 bg-blue-600 rounded-full" />
                     About This Class
                   </h2>
-                  <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-lg">
+                  <p className="text-slate-700 dark:text-slate-300 leading-relaxed text-lg">
                     {classDetails.description}
                   </p>
                 </CardContent>
@@ -209,10 +209,10 @@ const ClassDetailsEnroll = () => {
 
             {/* What You'll Learn */}
             <FadeIn delay={0.3}>
-              <Card className="border-none shadow-lg bg-white dark:bg-gray-900/50 backdrop-blur-sm">
+              <Card className="border-none shadow-sm bg-white dark:bg-gray-900/50 backdrop-blur-sm">
                 <CardContent className="p-8">
-                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-3">
-                    <div className="w-1 h-8 bg-gradient-to-b from-blue-600 to-purple-600 rounded-full" />
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-6 flex items-center gap-3">
+                    <div className="w-1 h-8 bg-blue-600 rounded-full" />
                     What You'll Learn
                   </h2>
                   <div className="grid md:grid-cols-2 gap-4">
@@ -229,10 +229,10 @@ const ClassDetailsEnroll = () => {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         transition={{ delay: 0.4 + index * 0.1 }}
-                        className="flex items-start gap-3 p-3 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
+                        className="flex items-start gap-3 p-3 rounded-lg hover:bg-slate-50 dark:hover:bg-gray-800/50 transition-colors"
                       >
-                        <FiCheckCircle className="w-5 h-5 text-green-500 dark:text-green-400 mt-0.5 flex-shrink-0" />
-                        <span className="text-gray-700 dark:text-gray-300">{item}</span>
+                        <FiCheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
+                        <span className="text-slate-700 dark:text-slate-300">{item}</span>
                       </motion.div>
                     ))}
                   </div>
@@ -245,9 +245,9 @@ const ClassDetailsEnroll = () => {
           <div className="lg:col-span-1">
             <FadeIn delay={0.2}>
               <div className="sticky top-8">
-                <Card className="border-none shadow-2xl bg-white dark:bg-gray-900/80 backdrop-blur-xl overflow-hidden">
+                <Card className="border-none shadow-lg bg-white dark:bg-gray-900/80 backdrop-blur-xl overflow-hidden">
                   {/* Price Header */}
-                  <div className="bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-500 dark:to-purple-500 p-6 text-white">
+                  <div className="bg-blue-600 dark:bg-blue-600 p-6 text-white">
                     <p className="text-sm font-medium opacity-90 mb-2">Course Price</p>
                     <div className="flex items-baseline gap-2">
                       <span className="text-5xl font-bold">${classDetails.price}</span>
@@ -265,7 +265,7 @@ const ClassDetailsEnroll = () => {
                       <Button
                         onClick={handleEnroll}
                         size="lg"
-                        className="w-full h-14 text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500 dark:hover:from-blue-600 dark:hover:to-purple-600 text-white border-none shadow-lg shadow-blue-500/30 dark:shadow-purple-500/30 hover:shadow-xl hover:shadow-blue-500/40 dark:hover:shadow-purple-500/40 transition-all duration-300"
+                        className="w-full h-14 text-lg font-bold bg-blue-600 hover:bg-blue-700 text-white border-none shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-300"
                       >
                         Enroll Now
                       </Button>
@@ -295,14 +295,14 @@ const ClassDetailsEnroll = () => {
                     </div>
 
                     {/* Money Back Guarantee */}
-                    <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                    <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
                       <div className="flex items-start gap-3">
-                        <FiCheckCircle className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5 flex-shrink-0" />
+                        <FiCheckCircle className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 flex-shrink-0" />
                         <div>
-                          <p className="font-semibold text-green-900 dark:text-green-100 text-sm">
+                          <p className="font-semibold text-blue-900 dark:text-blue-100 text-sm">
                             30-Day Money-Back Guarantee
                           </p>
-                          <p className="text-xs text-green-700 dark:text-green-300 mt-1">
+                          <p className="text-xs text-blue-700 dark:text-blue-300 mt-1">
                             Full refund if you're not satisfied
                           </p>
                         </div>

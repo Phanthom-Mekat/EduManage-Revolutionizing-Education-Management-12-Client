@@ -11,11 +11,10 @@ const StarRating = ({ rating, size = 20 }) => {
         <Star
           key={star}
           size={size}
-          className={`${
-            star <= rating
-              ? "fill-yellow-400 text-yellow-400"
-              : "fill-gray-200 text-gray-200"
-          }`}
+          className={`${star <= rating
+            ? "fill-yellow-400 text-yellow-400"
+            : "fill-gray-200 text-gray-200"
+            }`}
         />
       ))}
     </div>
@@ -100,11 +99,10 @@ const FeedbackSection = () => {
               <button
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
-                className={`px-4 py-2 rounded-full transition-all ${
-                  activeFilter === filter
-                    ? "bg-blue-500 text-white dark:bg-blue-400"
-                    : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
-                }`}
+                className={`px-4 py-2 rounded-full transition-all ${activeFilter === filter
+                  ? "bg-blue-500 text-white dark:bg-blue-400"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+                  }`}
               >
                 {filter === "all" ? "All Reviews" : `${filter} Stars`}
               </button>

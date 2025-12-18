@@ -42,13 +42,13 @@ const TeacherRequest = () => {
     setProcessing(true);
     try {
       console.log("Approving request for:", request.instructorEmail);
-  
+
       // Step 1: Approve the teacher request
       const approveResponse = await axios.put(
         `https://edumanagebackend.vercel.app/reqteachers/${request._id}/approve`
       );
       console.log("Approval response:", approveResponse.data);
-  
+
       toast.success("Teacher request approved successfully");
       fetchTeacherRequests(); // Refresh the list
     } catch (error) {
@@ -217,11 +217,10 @@ const TeacherRequest = () => {
                           <Badge className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 border-none">
                             {request.category}
                           </Badge>
-                          <Badge className={`${
-                            request.status === "pending" ? "bg-yellow-500 text-white" :
+                          <Badge className={`${request.status === "pending" ? "bg-yellow-500 text-white" :
                             request.status === "approved" ? "bg-green-500 text-white" :
-                            "bg-red-500 text-white"
-                          } border-none shadow-sm`}>
+                              "bg-red-500 text-white"
+                            } border-none shadow-sm`}>
                             {request.status === "approved" && <CheckCircle className="w-3 h-3 mr-1" />}
                             {request.status === "rejected" && <XCircle className="w-3 h-3 mr-1" />}
                             {request.status === "pending" && <Clock className="w-3 h-3 mr-1" />}

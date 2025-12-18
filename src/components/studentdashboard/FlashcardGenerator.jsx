@@ -1,24 +1,25 @@
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent } from "@/components/ui/card"
 import { Textarea } from "@/components/ui/textarea"
-import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { motion, AnimatePresence } from "framer-motion"
-import { 
-  Sparkles, 
-  Plus, 
-  Shuffle, 
-  BookOpen, 
+import {
+  Sparkles,
+  Plus,
+  Shuffle,
+  BookOpen,
   Loader2,
   RotateCw,
   Check,
   X,
   Brain,
   Zap,
-  TrendingUp
+  Lightbulb,
+  Layers
 } from "lucide-react"
 import toast from "react-hot-toast"
+import { generateFlashcards as generateFlashcardsAI } from "@/lib/gemini-ai"
 
 const FlashcardGenerator = () => {
   const [content, setContent] = useState("")
@@ -29,6 +30,8 @@ const FlashcardGenerator = () => {
   const [mode, setMode] = useState("study") // study, quiz
   const [quizAnswers, setQuizAnswers] = useState({})
   const [showResults, setShowResults] = useState(false)
+  const [showHint, setShowHint] = useState(false)
+  const [flashcardSet, setFlashcardSet] = useState(null)
 
   const generateFlashcards = async () => {
     if (!content.trim()) {
@@ -38,65 +41,31 @@ const FlashcardGenerator = () => {
 
     setLoading(true)
     try {
-      const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${import.meta.env.VITE_GROQ_API_KEY}`
-        },
-        body: JSON.stringify({
-          model: "llama-3.3-70b-versatile",
-          messages: [
-            {
-              role: "user",
-              content: `Generate 8 educational flashcards from this content. Return ONLY valid JSON in this exact format:
-{
-  "flashcards": [
-    {
-      "id": 1,
-      "question": "Clear question here",
-      "answer": "Concise answer here",
-      "category": "topic category"
-    }
-  ]
-}
-
-Content: ${content}
-
-Make questions clear and answers concise (1-2 sentences). Cover key concepts.`
-            }
-          ],
-          temperature: 0.8,
-          max_tokens: 2000
-        })
-      })
-
-      const data = await response.json()
-      const responseText = data.choices[0]?.message?.content || ""
-      
-      const jsonMatch = responseText.match(/\{[\s\S]*\}/)
-      if (jsonMatch) {
-        const parsed = JSON.parse(jsonMatch[0])
-        setFlashcards(parsed.flashcards || [])
-        setCurrentIndex(0)
-        setIsFlipped(false)
-        setQuizAnswers({})
-        setShowResults(false)
-        toast.success(`Generated ${parsed.flashcards?.length || 0} flashcards!`)
-      } else {
-        throw new Error("Invalid response format")
-      }
+      const result = await generateFlashcardsAI(content, 10)
+      setFlashcards(result.cards || [])
+      setFlashcardSet(result)
+      setCurrentIndex(0)
+      setIsFlipped(false)
+      setQuizAnswers({})
+      setShowResults(false)
+      setShowHint(false)
+      toast.success(`Generated ${result.cards?.length || 0} enhanced flashcards!`)
     } catch (error) {
       console.error("Flashcard generation error:", error)
       toast.error("Failed to generate flashcards")
-      
+
       // Fallback flashcards
       setFlashcards([
         {
           id: 1,
-          question: "What is the main concept discussed?",
-          answer: "Based on the provided content.",
-          category: "General"
+          front: "What is the main concept?",
+          back: "Based on the provided content.",
+          category: "General",
+          categoryEmoji: "📚",
+          difficulty: "medium",
+          difficultyEmoji: "🟡",
+          hint: "Think about the core idea",
+          memoryTip: "Relate it to something familiar"
         }
       ])
     } finally {
@@ -108,6 +77,7 @@ Make questions clear and answers concise (1-2 sentences). Cover key concepts.`
     if (currentIndex < flashcards.length - 1) {
       setCurrentIndex(currentIndex + 1)
       setIsFlipped(false)
+      setShowHint(false)
     }
   }
 
@@ -115,6 +85,7 @@ Make questions clear and answers concise (1-2 sentences). Cover key concepts.`
     if (currentIndex > 0) {
       setCurrentIndex(currentIndex - 1)
       setIsFlipped(false)
+      setShowHint(false)
     }
   }
 
@@ -123,6 +94,7 @@ Make questions clear and answers concise (1-2 sentences). Cover key concepts.`
     setFlashcards(shuffled)
     setCurrentIndex(0)
     setIsFlipped(false)
+    setShowHint(false)
     toast.success("Flashcards shuffled")
   }
 
@@ -131,14 +103,14 @@ Make questions clear and answers concise (1-2 sentences). Cover key concepts.`
       ...quizAnswers,
       [flashcards[currentIndex].id]: correct
     })
-    
+
     setTimeout(() => {
       if (currentIndex < flashcards.length - 1) {
         nextCard()
       } else {
         setShowResults(true)
       }
-    }, 500)
+    }, 300)
   }
 
   const resetQuiz = () => {
@@ -146,6 +118,7 @@ Make questions clear and answers concise (1-2 sentences). Cover key concepts.`
     setCurrentIndex(0)
     setIsFlipped(false)
     setShowResults(false)
+    setShowHint(false)
   }
 
   const currentCard = flashcards[currentIndex]
@@ -153,21 +126,30 @@ Make questions clear and answers concise (1-2 sentences). Cover key concepts.`
   const totalAnswered = Object.keys(quizAnswers).length
 
   return (
-    <div className="container mx-auto p-4 max-w-5xl">
+    <div className="container mx-auto p-4 max-w-5xl space-y-8">
+      {/* Header */}
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="mb-6"
+        transition={{ duration: 0.5 }}
       >
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-            <Brain className="w-6 h-6 text-white" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              AI Flashcard Generator
-            </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400">Create smart study cards instantly</p>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-14 h-14 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+              <Layers className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+                FLASHCARD<span className="text-blue-600">GENERATOR</span>
+              </h1>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="flex h-2 w-2 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+                <p className="text-sm font-medium text-slate-500 uppercase tracking-widest">AI Powered Study Tool</p>
+              </div>
+            </div>
           </div>
         </div>
       </motion.div>
@@ -177,240 +159,309 @@ Make questions clear and answers concise (1-2 sentences). Cover key concepts.`
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <Card className="border-none shadow-lg bg-white dark:bg-gray-900/50 backdrop-blur-xl">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-blue-600" />
-                Generate Flashcards
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
-                    Paste your study material
-                  </label>
-                  <Textarea
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder="Enter your notes, textbook excerpts, or any educational content..."
-                    className="min-h-[200px]"
-                  />
-                </div>
-                <Button
-                  onClick={generateFlashcards}
-                  disabled={loading || !content.trim()}
-                  className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white"
-                >
-                  {loading ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Generating...
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4 mr-2" />
-                      Generate Flashcards
-                    </>
-                  )}
-                </Button>
+          <Card className="border-0 shadow-xl bg-white dark:bg-slate-900 overflow-hidden ring-1 ring-slate-200 dark:ring-slate-800 rounded-2xl">
+            <CardContent className="p-8 space-y-6">
+              <div>
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-200 mb-2">
+                  Source Material
+                </h3>
+                <p className="text-sm text-slate-500 mb-4">
+                  Paste your notes, textbook excerpts, or any educational content below.
+                </p>
+                <Textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="E.g., The mitochondria is the powerhouse of the cell..."
+                  className="min-h-[240px] bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 focus:ring-blue-500/20 focus:border-blue-500 resize-none text-base leading-relaxed p-4 rounded-xl"
+                />
               </div>
+
+              <Button
+                onClick={generateFlashcards}
+                disabled={loading || !content.trim()}
+                className="w-full h-14 text-lg font-bold rounded-xl bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/30 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              >
+                {loading ? (
+                  <div className="flex items-center">
+                    <Loader2 className="w-5 h-5 mr-3 animate-spin" />
+                    Analyzing Content...
+                  </div>
+                ) : (
+                  <div className="flex items-center">
+                    <Sparkles className="w-5 h-5 mr-3" />
+                    Generate Flashcards
+                  </div>
+                )}
+              </Button>
             </CardContent>
           </Card>
         </motion.div>
       ) : (
-        <div className="space-y-4">
-          {/* Mode Toggle */}
-          <div className="flex justify-between items-center">
+        <div className="space-y-6">
+          {/* Controls */}
+          <div className="flex flex-wrap justify-between items-center gap-4 bg-slate-100 dark:bg-slate-800/50 p-2 rounded-2xl">
             <div className="flex gap-2">
               <Button
-                variant={mode === "study" ? "default" : "outline"}
-                size="sm"
+                variant="ghost"
                 onClick={() => {
                   setMode("study")
                   resetQuiz()
                 }}
-                className={mode === "study" ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white" : ""}
+                className={`rounded-xl transition-all duration-300 ${mode === "study" ? "bg-white dark:bg-slate-800 text-blue-600 shadow-sm font-bold" : "text-slate-500 hover:text-slate-700"}`}
               >
-                <BookOpen className="w-4 h-4 mr-1" />
+                <BookOpen className="w-4 h-4 mr-2" />
                 Study Mode
               </Button>
               <Button
-                variant={mode === "quiz" ? "default" : "outline"}
-                size="sm"
+                variant="ghost"
                 onClick={() => {
                   setMode("quiz")
                   resetQuiz()
                 }}
-                className={mode === "quiz" ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white" : ""}
+                className={`rounded-xl transition-all duration-300 ${mode === "quiz" ? "bg-white dark:bg-slate-800 text-blue-600 shadow-sm font-bold" : "text-slate-500 hover:text-slate-700"}`}
               >
-                <Zap className="w-4 h-4 mr-1" />
+                <Zap className="w-4 h-4 mr-2" />
                 Quiz Mode
               </Button>
             </div>
+
             <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={shuffle}>
-                <Shuffle className="w-4 h-4 mr-1" />
+              <Button variant="ghost" onClick={shuffle} className="text-slate-500 hover:text-blue-600 hover:bg-blue-50 rounded-xl">
+                <Shuffle className="w-4 h-4 mr-2" />
                 Shuffle
               </Button>
-              <Button 
-                variant="outline" 
-                size="sm" 
+              <Button
+                variant="ghost"
                 onClick={() => {
                   setFlashcards([])
                   setContent("")
                 }}
+                className="text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-xl"
               >
-                <Plus className="w-4 h-4 mr-1" />
+                <Plus className="w-4 h-4 mr-2" />
                 New Set
               </Button>
             </div>
           </div>
 
           {/* Progress */}
-          <div className="flex items-center justify-between">
-            <Badge variant="outline" className="text-sm">
-              Card {currentIndex + 1} of {flashcards.length}
-            </Badge>
+          <div className="flex items-center justify-between px-4">
+            <span className="text-sm font-medium text-slate-500 uppercase tracking-wider">
+              Card {currentIndex + 1} / {flashcards.length}
+            </span>
             {mode === "quiz" && totalAnswered > 0 && (
-              <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
+              <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-200 border-blue-200">
                 Score: {correctCount}/{totalAnswered}
               </Badge>
             )}
           </div>
 
-          {/* Flashcard */}
+          {/* Flashcard Area */}
           {!showResults ? (
             <motion.div
               key={currentIndex}
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.3 }}
+              className="relative perspective-1000"
             >
-              <Card 
-                className="border-none shadow-2xl bg-white dark:bg-gray-900/50 backdrop-blur-xl cursor-pointer h-[400px] relative overflow-hidden"
+              <div
+                className="relative min-h-[400px] w-full"
                 onClick={() => mode === "study" && setIsFlipped(!isFlipped)}
               >
-                <div className="absolute top-4 right-4">
-                  {currentCard?.category && (
-                    <Badge className="bg-gradient-to-r from-blue-600 to-purple-600 text-white">
-                      {currentCard.category}
-                    </Badge>
-                  )}
-                </div>
-                <CardContent className="h-full flex items-center justify-center p-8">
-                  <AnimatePresence mode="wait">
-                    {!isFlipped ? (
-                      <motion.div
-                        key="question"
-                        initial={{ rotateY: 90 }}
-                        animate={{ rotateY: 0 }}
-                        exit={{ rotateY: -90 }}
-                        transition={{ duration: 0.3 }}
-                        className="text-center"
-                      >
-                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-blue-500/30">
-                          <BookOpen className="w-8 h-8 text-white" />
+                <AnimatePresence mode="wait">
+                  {!isFlipped ? (
+                    <motion.div
+                      key="front"
+                      initial={{ rotateY: -90, opacity: 0 }}
+                      animate={{ rotateY: 0, opacity: 1 }}
+                      exit={{ rotateY: 90, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="absolute inset-0"
+                    >
+                      <Card className="h-full border-0 shadow-lg ring-1 ring-slate-200 dark:ring-slate-800 bg-white dark:bg-slate-900 rounded-3xl cursor-pointer hover:shadow-xl transition-shadow flex flex-col items-center justify-center p-8 md:p-12 text-center">
+
+                        {/* Badges */}
+                        <div className="absolute top-6 left-6 flex gap-2">
+                          {currentCard?.difficultyEmoji && (
+                            <Badge variant="outline" className="border-slate-200 text-slate-500">
+                              {currentCard.difficultyEmoji} {currentCard.difficulty}
+                            </Badge>
+                          )}
                         </div>
-                        <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-4">
-                          {currentCard?.question}
+                        <div className="absolute top-6 right-6">
+                          {currentCard?.categoryEmoji && (
+                            <Badge className="bg-slate-100 text-slate-700 hover:bg-slate-200 border-0">
+                              {currentCard.categoryEmoji} {currentCard.category}
+                            </Badge>
+                          )}
+                        </div>
+
+                        <div className="w-20 h-20 rounded-2xl bg-blue-50 dark:bg-slate-800 flex items-center justify-center mb-8">
+                          <Brain className="w-10 h-10 text-blue-600" />
+                        </div>
+
+                        <h2 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white mb-6 leading-tight">
+                          {currentCard?.front || currentCard?.question}
                         </h2>
-                        {mode === "study" && (
-                          <p className="text-sm text-gray-500">Click to reveal answer</p>
+
+                        {/* Hint button */}
+                        {currentCard?.hint && (
+                          <div className="mt-4" onClick={(e) => e.stopPropagation()}>
+                            {!showHint ? (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => setShowHint(true)}
+                                className="text-yellow-600 hover:text-yellow-700 hover:bg-yellow-50"
+                              >
+                                <Lightbulb className="w-4 h-4 mr-2" />
+                                Show Hint
+                              </Button>
+                            ) : (
+                              <motion.div
+                                initial={{ opacity: 0, y: 5 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                className="bg-yellow-50 text-yellow-800 px-4 py-2 rounded-lg text-sm font-medium border border-yellow-100"
+                              >
+                                💡 {currentCard.hint}
+                              </motion.div>
+                            )}
+                          </div>
                         )}
-                      </motion.div>
-                    ) : (
-                      <motion.div
-                        key="answer"
-                        initial={{ rotateY: 90 }}
-                        animate={{ rotateY: 0 }}
-                        exit={{ rotateY: -90 }}
-                        transition={{ duration: 0.3 }}
-                        className="text-center"
-                      >
-                        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-blue-600 flex items-center justify-center mx-auto mb-6 shadow-lg shadow-purple-500/30">
-                          <Sparkles className="w-8 h-8 text-white" />
+
+                        {mode === "study" && (
+                          <div className="absolute bottom-6 text-slate-400 text-sm font-medium animate-pulse">
+                            Click to flip
+                          </div>
+                        )}
+                      </Card>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="back"
+                      initial={{ rotateY: 90, opacity: 0 }}
+                      animate={{ rotateY: 0, opacity: 1 }}
+                      exit={{ rotateY: -90, opacity: 0 }}
+                      transition={{ duration: 0.3 }}
+                      className="absolute inset-0"
+                    >
+                      <Card className="h-full border-0 shadow-lg ring-1 ring-blue-100 dark:ring-blue-900 bg-slate-50 dark:bg-slate-900/50 rounded-3xl cursor-pointer flex flex-col items-center justify-center p-8 md:p-12 text-center">
+
+                        <div className="w-20 h-20 rounded-2xl bg-blue-600 flex items-center justify-center mb-8 shadow-lg shadow-blue-500/20">
+                          <Sparkles className="w-10 h-10 text-white" />
                         </div>
-                        <p className="text-xl text-gray-900 dark:text-gray-100 font-medium">
-                          {currentCard?.answer}
+
+                        <p className="text-xl md:text-2xl font-medium text-slate-800 dark:text-slate-100 mb-6 leading-relaxed">
+                          {currentCard?.back || currentCard?.answer}
                         </p>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </CardContent>
-              </Card>
+
+                        {/* Memory tip */}
+                        {currentCard?.memoryTip && (
+                          <div className="mt-4 bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 p-4 rounded-xl shadow-sm text-sm text-slate-600 dark:text-slate-300 max-w-lg">
+                            <strong className="text-blue-600 block mb-1">Memory Tip</strong>
+                            {currentCard.memoryTip}
+                          </div>
+                        )}
+                      </Card>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             </motion.div>
           ) : (
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
             >
-              <Card className="border-none shadow-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white">
-                <CardContent className="p-8 text-center">
-                  <TrendingUp className="w-16 h-16 mx-auto mb-4" />
-                  <h2 className="text-3xl font-bold mb-2">Quiz Complete!</h2>
-                  <p className="text-xl mb-6">
-                    You got {correctCount} out of {flashcards.length} correct
-                  </p>
-                  <p className="text-lg mb-6">
-                    Score: {((correctCount / flashcards.length) * 100).toFixed(0)}%
-                  </p>
+              <div className="bg-slate-900 text-white rounded-3xl p-12 text-center shadow-2xl relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-32 bg-blue-500/10 rounded-full blur-3xl -mr-16 -mt-16"></div>
+                <div className="absolute bottom-0 left-0 p-32 bg-purple-500/10 rounded-full blur-3xl -ml-16 -mb-16"></div>
+
+                <div className="relative z-10">
+                  <div className="w-24 h-24 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-6 ring-4 ring-slate-700">
+                    <Check className="w-12 h-12 text-green-400" />
+                  </div>
+
+                  <h2 className="text-4xl font-black mb-2">Quiz Complete!</h2>
+                  <p className="text-slate-400 mb-8 text-lg">You've mastered this set.</p>
+
+                  <div className="flex justify-center gap-8 mb-10">
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-blue-400">{correctCount}</div>
+                      <div className="text-xs uppercase tracking-wider text-slate-500 font-bold">Correct</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-slate-200">{flashcards.length}</div>
+                      <div className="text-xs uppercase tracking-wider text-slate-500 font-bold">Total</div>
+                    </div>
+                    <div className="text-center">
+                      <div className="text-3xl font-bold text-green-400">{((correctCount / flashcards.length) * 100).toFixed(0)}%</div>
+                      <div className="text-xs uppercase tracking-wider text-slate-500 font-bold">Score</div>
+                    </div>
+                  </div>
+
                   <Button
                     onClick={resetQuiz}
-                    className="bg-white text-blue-600 hover:bg-gray-100"
+                    size="lg"
+                    className="bg-white text-slate-900 hover:bg-slate-200 font-bold px-8 h-12 rounded-xl"
                   >
                     <RotateCw className="w-4 h-4 mr-2" />
-                    Try Again
+                    Study Again
                   </Button>
-                </CardContent>
-              </Card>
+                </div>
+              </div>
             </motion.div>
           )}
 
-          {/* Controls */}
+          {/* Navigation Controls */}
           {!showResults && (
-            <div className="flex justify-between items-center">
+            <div className="flex justify-between items-center pt-4">
               <Button
                 variant="outline"
                 onClick={prevCard}
                 disabled={currentIndex === 0}
+                className="rounded-xl border-slate-200 hover:bg-slate-50 text-slate-600"
               >
                 Previous
               </Button>
 
-              {mode === "quiz" && isFlipped && (
-                <div className="flex gap-2">
-                  <Button
-                    onClick={() => markAnswer(false)}
-                    className="bg-red-500 hover:bg-red-600 text-white"
-                  >
-                    <X className="w-4 h-4 mr-1" />
-                    Wrong
-                  </Button>
-                  <Button
-                    onClick={() => markAnswer(true)}
-                    className="bg-green-500 hover:bg-green-600 text-white"
-                  >
-                    <Check className="w-4 h-4 mr-1" />
-                    Correct
-                  </Button>
-                </div>
-              )}
+              <div className="flex gap-4">
+                {mode === "quiz" && isFlipped && (
+                  <>
+                    <Button
+                      onClick={() => markAnswer(false)}
+                      className="bg-red-50 hover:bg-red-100 text-red-600 border border-red-200 rounded-xl px-6"
+                    >
+                      <X className="w-4 h-4 mr-2" />
+                      Got it Wrong
+                    </Button>
+                    <Button
+                      onClick={() => markAnswer(true)}
+                      className="bg-green-50 hover:bg-green-100 text-green-600 border border-green-200 rounded-xl px-6"
+                    >
+                      <Check className="w-4 h-4 mr-2" />
+                      Got it Right
+                    </Button>
+                  </>
+                )}
 
-              {mode === "study" && (
-                <Button
-                  onClick={() => setIsFlipped(!isFlipped)}
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 text-white"
-                >
-                  <RotateCw className="w-4 h-4 mr-1" />
-                  Flip Card
-                </Button>
-              )}
+                {mode === "study" && (
+                  <Button
+                    onClick={() => setIsFlipped(!isFlipped)}
+                    className="bg-blue-600 hover:bg-blue-700 text-white rounded-xl shadow-lg shadow-blue-500/20 px-8"
+                  >
+                    <RotateCw className="w-4 h-4 mr-2" />
+                    Flip Card
+                  </Button>
+                )}
+              </div>
 
               <Button
                 variant="outline"
                 onClick={mode === "quiz" && !isFlipped ? () => setIsFlipped(true) : nextCard}
                 disabled={currentIndex === flashcards.length - 1 && (mode === "study" || isFlipped)}
+                className="rounded-xl border-slate-200 hover:bg-slate-50 text-slate-600"
               >
                 {mode === "quiz" && !isFlipped ? "Show Answer" : "Next"}
               </Button>
