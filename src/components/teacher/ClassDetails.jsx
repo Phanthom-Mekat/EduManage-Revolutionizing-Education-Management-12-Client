@@ -5,12 +5,22 @@ import axios from "axios"
 import CreateAssignmentModal from "./CreateAssignmentModal"
 import { useLoaderData } from "react-router-dom"
 import { motion } from "framer-motion"
-import { Users, FileCheck, Send, Plus, TrendingUp } from "lucide-react"
+import { Users, FileCheck, Send, Plus, TrendingUp, Link2, Copy, Check } from "lucide-react"
 
 const ClassDetails = () => {
   const loaderData = useLoaderData()
   const [classDetails, setClassDetails] = useState(loaderData)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [copied, setCopied] = useState(false)
+
+  // Generate class meeting link
+  const classLink = classDetails ? `https://meet.google.com/${classDetails._id.substring(0, 3)}-${classDetails._id.substring(3, 7)}-${classDetails._id.substring(7, 10)}` : ''
+
+  const copyClassLink = () => {
+    navigator.clipboard.writeText(classLink)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   const handleCreateAssignment = () => {
     setIsModalOpen(true)
@@ -73,6 +83,46 @@ const ClassDetails = () => {
               >
                 <Plus className="w-4 h-4 mr-2" />
                 Create Assignment
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </FadeIn>
+
+      {/* Class Link Section */}
+      <FadeIn delay={0.05}>
+        <Card className="border-none shadow-sm bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/20 dark:to-blue-900/20 backdrop-blur-xl">
+          <CardContent className="p-4">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center shadow-lg shadow-indigo-500/30 flex-shrink-0">
+                  <Link2 className="w-5 h-5 text-white" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-gray-900 dark:text-white">Class Link</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{classLink}</p>
+                </div>
+              </div>
+              <Button
+                onClick={copyClassLink}
+                variant="outline"
+                size="sm"
+                className={`flex-shrink-0 transition-all duration-200 ${copied
+                  ? 'bg-green-50 border-green-500 text-green-600 dark:bg-green-900/20 dark:border-green-400 dark:text-green-400'
+                  : 'hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-600 dark:hover:bg-indigo-900/20'
+                  }`}
+              >
+                {copied ? (
+                  <>
+                    <Check className="w-4 h-4 mr-1" />
+                    Copied!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 mr-1" />
+                    Copy Link
+                  </>
+                )}
               </Button>
             </div>
           </CardContent>
@@ -177,11 +227,10 @@ const ClassDetails = () => {
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Status</span>
-                    <span className={`text-sm font-semibold ${
-                      classDetails.status === 'approved' ? 'text-green-600 dark:text-green-400' :
+                    <span className={`text-sm font-semibold ${classDetails.status === 'approved' ? 'text-green-600 dark:text-green-400' :
                       classDetails.status === 'pending' ? 'text-yellow-600 dark:text-yellow-400' :
-                      'text-red-600 dark:text-red-400'
-                    }`}>
+                        'text-red-600 dark:text-red-400'
+                      }`}>
                       {classDetails.status}
                     </span>
                   </div>
@@ -193,14 +242,14 @@ const ClassDetails = () => {
                   </div>
                 </div>
               </div>
-              
+
               <div>
                 <h4 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Performance Metrics</h4>
                 <div className="space-y-2">
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600 dark:text-gray-400">Avg. Submissions per Assignment</span>
                     <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                      {classDetails.totalAssignments > 0 
+                      {classDetails.totalAssignments > 0
                         ? (classDetails.totalSubmissions / classDetails.totalAssignments).toFixed(1)
                         : 0}
                     </span>
