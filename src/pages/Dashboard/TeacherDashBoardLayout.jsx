@@ -16,10 +16,15 @@ import {
   Star,
   GraduationCap,
   Activity,
-  Sparkles
+  Sparkles,
+  Bell,
+  Clock,
+  Calendar,
+  CheckCircle,
+  MessageSquare
 } from "lucide-react";
 import { AuthContext } from "@/provider/AuthProvider";
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } from 'recharts';
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
 import PageTitle from "@/components/PageTitle";
@@ -97,6 +102,24 @@ const TeacherDashBoardLayout = () => {
     pending: classes.filter(cls => cls.status === 'pending').length,
     rejected: classes.filter(cls => cls.status === 'rejected').length
   };
+
+  // Mock data for new sections
+  const engagementData = [
+    { day: 'Mon', active: 45, submissions: 12 },
+    { day: 'Tue', active: 52, submissions: 15 },
+    { day: 'Wed', active: 38, submissions: 10 },
+    { day: 'Thu', active: 65, submissions: 22 },
+    { day: 'Fri', active: 58, submissions: 18 },
+    { day: 'Sat', active: 42, submissions: 14 },
+    { day: 'Sun', active: 30, submissions: 8 },
+  ];
+
+  const recentActivities = [
+    { id: 1, user: 'Sarah Johnson', action: 'submitted assignment', target: 'Web Development Basics', time: '2 mins ago', icon: FileCheck, color: 'text-green-500', bg: 'bg-green-100 dark:bg-green-900/30' },
+    { id: 2, user: 'Mike Chen', action: 'enrolled in', target: 'Advanced React Patterns', time: '1 hour ago', icon: User, color: 'text-blue-500', bg: 'bg-blue-100 dark:bg-blue-900/30' },
+    { id: 3, user: 'System', action: 'Class approved', target: 'UI/UX Design Masterclass', time: '3 hours ago', icon: CheckCircle, color: 'text-purple-500', bg: 'bg-purple-100 dark:bg-purple-900/30' },
+    { id: 4, user: 'Anna Li', action: 'posted a question', target: 'JavaScript Fundamentals', time: '5 hours ago', icon: MessageSquare, color: 'text-yellow-500', bg: 'bg-yellow-100 dark:bg-yellow-900/30' },
+  ];
 
   const FadeIn = ({ children, delay = 0 }) => (
     <motion.div
@@ -398,6 +421,104 @@ const TeacherDashBoardLayout = () => {
           </CardContent>
         </Card>
       </FadeIn>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Student Engagement Trends */}
+        <FadeIn delay={0.8}>
+          <Card className="col-span-2 border-none shadow-sm bg-white dark:bg-gray-900/50 backdrop-blur-xl h-full">
+            <CardContent className="p-6">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-bold text-gray-900 dark:text-white">
+                  Student Engagement Trends
+                </h3>
+                <div className="flex items-center gap-2">
+                  <span className="flex items-center text-xs text-gray-500">
+                    <div className="w-2 h-2 rounded-full bg-blue-500 mr-1"></div> Active
+                  </span>
+                  <span className="flex items-center text-xs text-gray-500">
+                    <div className="w-2 h-2 rounded-full bg-purple-500 mr-1"></div> Submissions
+                  </span>
+                </div>
+              </div>
+              <div className="h-64">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={engagementData}>
+                    <defs>
+                      <linearGradient id="activeGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#3b82f6" stopOpacity={0} />
+                      </linearGradient>
+                      <linearGradient id="submissionsGradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#8b5cf6" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#8b5cf6" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" vertical={false} />
+                    <XAxis
+                      dataKey="day"
+                      tick={{ fill: 'currentColor' }}
+                      className="text-xs text-gray-600 dark:text-gray-400"
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis
+                      tick={{ fill: 'currentColor' }}
+                      className="text-xs text-gray-600 dark:text-gray-400"
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                        border: 'none',
+                        borderRadius: '12px',
+                        boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
+                      }}
+                    />
+                    <Area type="monotone" dataKey="active" stroke="#3b82f6" strokeWidth={3} fillOpacity={1} fill="url(#activeGradient)" />
+                    <Area type="monotone" dataKey="submissions" stroke="#8b5cf6" strokeWidth={3} fillOpacity={1} fill="url(#submissionsGradient)" />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </FadeIn>
+
+        {/* Recent Activity */}
+        <FadeIn delay={0.9}>
+          <Card className="border-none shadow-sm bg-white dark:bg-gray-900/50 backdrop-blur-xl h-full">
+            <CardContent className="p-6">
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-6 flex items-center gap-2">
+                <Clock className="w-5 h-5 text-blue-500" />
+                Recent Activity
+              </h3>
+              <div className="space-y-6">
+                {recentActivities.map((activity) => (
+                  <div key={activity.id} className="flex gap-4">
+                    <div className={`w-10 h-10 rounded-full ${activity.bg} flex items-center justify-center flex-shrink-0`}>
+                      <activity.icon className={`w-5 h-5 ${activity.color}`} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+                        {activity.user}
+                      </p>
+                      <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                        {activity.action} <span className="text-indigo-600 dark:text-indigo-400">{activity.target}</span>
+                      </p>
+                      <p className="text-[10px] text-gray-400 mt-1">
+                        {activity.time}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Button variant="ghost" className="w-full mt-6 text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400">
+                View All Activity
+              </Button>
+            </CardContent>
+          </Card>
+        </FadeIn>
+      </div>
     </div>
   );
 
