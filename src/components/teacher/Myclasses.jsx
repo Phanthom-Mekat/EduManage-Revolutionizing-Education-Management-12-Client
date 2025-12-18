@@ -7,11 +7,11 @@ import { Input } from "@/components/ui/input"
 import axios from "axios"
 import { AuthContext } from "@/provider/AuthProvider"
 import { motion } from "framer-motion"
-import { 
-  Search, 
-  Eye, 
-  Trash2, 
-  Users, 
+import {
+  Search,
+  Eye,
+  Trash2,
+  Users,
   DollarSign,
   BookOpen,
   CheckCircle,
@@ -135,16 +135,15 @@ const MyClasses = () => {
       {/* Stats Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <FadeIn delay={0.1}>
-          <motion.div 
+          <motion.div
             whileHover={{ scale: 1.02 }}
             onClick={() => setFilterStatus("all")}
             className="cursor-pointer"
           >
-            <Card className={`border-none shadow-sm transition-all duration-300 ${
-              filterStatus === "all" 
-                ? "ring-2 ring-blue-500 shadow-lg" 
-                : "hover:shadow-lg"
-            } bg-white dark:bg-gray-900/50 backdrop-blur-xl`}>
+            <Card className={`border-none shadow-sm transition-all duration-300 ${filterStatus === "all"
+              ? "ring-2 ring-blue-500 shadow-lg"
+              : "hover:shadow-lg"
+              } bg-white dark:bg-gray-900/50 backdrop-blur-xl`}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -161,16 +160,15 @@ const MyClasses = () => {
         </FadeIn>
 
         <FadeIn delay={0.2}>
-          <motion.div 
+          <motion.div
             whileHover={{ scale: 1.02 }}
             onClick={() => setFilterStatus("approved")}
             className="cursor-pointer"
           >
-            <Card className={`border-none shadow-sm transition-all duration-300 ${
-              filterStatus === "approved" 
-                ? "ring-2 ring-green-500 shadow-lg" 
-                : "hover:shadow-lg"
-            } bg-white dark:bg-gray-900/50 backdrop-blur-xl`}>
+            <Card className={`border-none shadow-sm transition-all duration-300 ${filterStatus === "approved"
+              ? "ring-2 ring-green-500 shadow-lg"
+              : "hover:shadow-lg"
+              } bg-white dark:bg-gray-900/50 backdrop-blur-xl`}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -187,16 +185,15 @@ const MyClasses = () => {
         </FadeIn>
 
         <FadeIn delay={0.3}>
-          <motion.div 
+          <motion.div
             whileHover={{ scale: 1.02 }}
             onClick={() => setFilterStatus("pending")}
             className="cursor-pointer"
           >
-            <Card className={`border-none shadow-sm transition-all duration-300 ${
-              filterStatus === "pending" 
-                ? "ring-2 ring-yellow-500 shadow-lg" 
-                : "hover:shadow-lg"
-            } bg-white dark:bg-gray-900/50 backdrop-blur-xl`}>
+            <Card className={`border-none shadow-sm transition-all duration-300 ${filterStatus === "pending"
+              ? "ring-2 ring-yellow-500 shadow-lg"
+              : "hover:shadow-lg"
+              } bg-white dark:bg-gray-900/50 backdrop-blur-xl`}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -213,16 +210,15 @@ const MyClasses = () => {
         </FadeIn>
 
         <FadeIn delay={0.4}>
-          <motion.div 
+          <motion.div
             whileHover={{ scale: 1.02 }}
             onClick={() => setFilterStatus("rejected")}
             className="cursor-pointer"
           >
-            <Card className={`border-none shadow-sm transition-all duration-300 ${
-              filterStatus === "rejected" 
-                ? "ring-2 ring-red-500 shadow-lg" 
-                : "hover:shadow-lg"
-            } bg-white dark:bg-gray-900/50 backdrop-blur-xl`}>
+            <Card className={`border-none shadow-sm transition-all duration-300 ${filterStatus === "rejected"
+              ? "ring-2 ring-red-500 shadow-lg"
+              : "hover:shadow-lg"
+              } bg-white dark:bg-gray-900/50 backdrop-blur-xl`}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>

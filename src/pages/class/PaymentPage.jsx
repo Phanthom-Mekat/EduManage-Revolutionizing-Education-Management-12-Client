@@ -9,10 +9,10 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { AuthContext } from "@/provider/AuthProvider"
 import { motion, AnimatePresence } from "framer-motion"
-import { 
-  FiCreditCard, 
-  FiLock, 
-  FiCheckCircle, 
+import {
+  FiCreditCard,
+  FiLock,
+  FiCheckCircle,
   FiShield,
   FiCalendar,
   FiInfo,
@@ -20,11 +20,11 @@ import {
   FiArrowLeft,
   FiDollarSign
 } from "react-icons/fi"
-import { 
-  SiVisa, 
-  SiMastercard, 
+import {
+  SiVisa,
+  SiMastercard,
   SiAmericanexpress,
-  SiDiscover 
+  SiDiscover
 } from "react-icons/si"
 import { FadeIn, SkeletonLoader } from "@/components/ui/micro-interactions"
 import { Breadcrumbs } from "@/components/ui/breadcrumbs"
@@ -44,7 +44,7 @@ const PaymentPage = () => {
   const [validationErrors, setValidationErrors] = useState({})
   const [cardType, setCardType] = useState("")
   const [focusedField, setFocusedField] = useState("")
-  
+
   const { id } = useParams()
   const navigate = useNavigate()
   const { user } = useContext(AuthContext)
@@ -82,34 +82,34 @@ const PaymentPage = () => {
 
   const validateForm = () => {
     const errors = {}
-    
+
     const cardNumber = paymentInfo.cardNumber.replace(/\s/g, '')
     if (!/^\d{16}$/.test(cardNumber)) {
       errors.cardNumber = "Card number must be 16 digits"
     }
-    
+
     if (!paymentInfo.cardholderName.trim()) {
       errors.cardholderName = "Cardholder name is required"
     }
-    
+
     if (!/^\d{2}\/\d{2}$/.test(paymentInfo.expiryDate)) {
       errors.expiryDate = "Expiry date must be in MM/YY format"
     } else {
       const [month, year] = paymentInfo.expiryDate.split('/')
       const currentYear = new Date().getFullYear() % 100
       const currentMonth = new Date().getMonth() + 1
-      
+
       if (parseInt(month) < 1 || parseInt(month) > 12) {
         errors.expiryDate = "Invalid month"
       } else if (parseInt(year) < currentYear || (parseInt(year) === currentYear && parseInt(month) < currentMonth)) {
         errors.expiryDate = "Card has expired"
       }
     }
-    
+
     if (!/^\d{3,4}$/.test(paymentInfo.cvv)) {
       errors.cvv = "CVV must be 3-4 digits"
     }
-    
+
     setValidationErrors(errors)
     return Object.keys(errors).length === 0
   }
@@ -148,7 +148,7 @@ const PaymentPage = () => {
       ...prev,
       [name]: formattedValue
     }))
-    
+
     // Clear validation error when user starts typing
     if (validationErrors[name]) {
       setValidationErrors(prev => ({ ...prev, [name]: "" }))
@@ -158,7 +158,7 @@ const PaymentPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault()
     setError("")
-    
+
     if (!validateForm()) {
       setError("Please correct the errors before submitting.")
       return
@@ -175,7 +175,7 @@ const PaymentPage = () => {
 
       if (paymentResponse.data.success) {
         setSuccess(true)
-        
+
         // Wait for success animation
         setTimeout(async () => {
           try {
@@ -183,7 +183,7 @@ const PaymentPage = () => {
               classId: id,
               userId: user?.uid
             });
-            
+
             // Navigate after successful enrollment
             setTimeout(() => {
               navigate("/dashboard/my-enroll-class");
@@ -208,7 +208,7 @@ const PaymentPage = () => {
 
   const getCardIcon = (type) => {
     const iconClass = "w-8 h-8"
-    switch(type) {
+    switch (type) {
       case 'visa': return <SiVisa className={iconClass} />
       case 'mastercard': return <SiMastercard className={iconClass} />
       case 'amex': return <SiAmericanexpress className={iconClass} />
@@ -246,7 +246,7 @@ const PaymentPage = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-blue-50/30 to-purple-50/30 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="container mx-auto px-4 py-8 max-w-6xl">
         {/* Header */}
         <FadeIn>
@@ -259,10 +259,10 @@ const PaymentPage = () => {
               <span className="font-medium">Back</span>
             </button>
             <Breadcrumbs items={breadcrumbItems} className="mb-4" />
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+            <h1 className="text-4xl font-bold text-slate-900 dark:text-white">
               Secure Checkout
             </h1>
-            <p className="text-gray-600 dark:text-gray-400 mt-2">Complete your purchase securely</p>
+            <p className="text-slate-600 dark:text-slate-400 mt-2">Complete your purchase securely</p>
           </div>
         </FadeIn>
 
@@ -307,14 +307,14 @@ const PaymentPage = () => {
           {/* Payment Form */}
           <FadeIn delay={0.1}>
             <Card className="border-none shadow-2xl bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl">
-              <CardHeader className="border-b border-gray-200 dark:border-gray-800 pb-6">
+              <CardHeader className="border-b border-slate-200 dark:border-slate-800 pb-6">
                 <div className="flex items-center gap-3">
-                  <div className="w-12 h-12 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-xl bg-blue-600 flex items-center justify-center">
                     <FiCreditCard className="w-6 h-6 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-2xl font-bold text-gray-900 dark:text-white">Payment Details</h2>
-                    <p className="text-sm text-gray-600 dark:text-gray-400">Enter your card information</p>
+                    <h2 className="text-2xl font-bold text-slate-900 dark:text-white">Payment Details</h2>
+                    <p className="text-sm text-slate-600 dark:text-slate-400">Enter your card information</p>
                   </div>
                 </div>
               </CardHeader>
@@ -355,13 +355,12 @@ const PaymentPage = () => {
                         onFocus={() => setFocusedField("cardholderName")}
                         onBlur={() => setFocusedField("")}
                         placeholder="JOHN DOE"
-                        className={`h-12 pl-4 pr-4 bg-gray-50 dark:bg-gray-800 border-2 transition-all duration-300 ${
-                          focusedField === "cardholderName" 
-                            ? "border-blue-500 dark:border-blue-400 shadow-lg shadow-blue-500/20" 
-                            : validationErrors.cardholderName 
-                            ? "border-red-500 dark:border-red-500" 
+                        className={`h-12 pl-4 pr-4 bg-gray-50 dark:bg-gray-800 border-2 transition-all duration-300 ${focusedField === "cardholderName"
+                          ? "border-blue-500 dark:border-blue-400 shadow-lg shadow-blue-500/20"
+                          : validationErrors.cardholderName
+                            ? "border-red-500 dark:border-red-500"
                             : "border-gray-200 dark:border-gray-700"
-                        }`}
+                          }`}
                         required
                       />
                     </div>
@@ -393,13 +392,12 @@ const PaymentPage = () => {
                         onBlur={() => setFocusedField("")}
                         maxLength={19}
                         placeholder="1234 5678 9012 3456"
-                        className={`h-12 pl-4 pr-14 bg-gray-50 dark:bg-gray-800 border-2 transition-all duration-300 ${
-                          focusedField === "cardNumber" 
-                            ? "border-blue-500 dark:border-blue-400 shadow-lg shadow-blue-500/20" 
-                            : validationErrors.cardNumber 
-                            ? "border-red-500 dark:border-red-500" 
+                        className={`h-12 pl-4 pr-14 bg-gray-50 dark:bg-gray-800 border-2 transition-all duration-300 ${focusedField === "cardNumber"
+                          ? "border-blue-500 dark:border-blue-400 shadow-lg shadow-blue-500/20"
+                          : validationErrors.cardNumber
+                            ? "border-red-500 dark:border-red-500"
                             : "border-gray-200 dark:border-gray-700"
-                        }`}
+                          }`}
                         required
                       />
                       <div className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500">
@@ -435,13 +433,12 @@ const PaymentPage = () => {
                           onBlur={() => setFocusedField("")}
                           maxLength={5}
                           placeholder="MM/YY"
-                          className={`h-12 pl-4 pr-10 bg-gray-50 dark:bg-gray-800 border-2 transition-all duration-300 ${
-                            focusedField === "expiryDate" 
-                              ? "border-blue-500 dark:border-blue-400 shadow-lg shadow-blue-500/20" 
-                              : validationErrors.expiryDate 
-                              ? "border-red-500 dark:border-red-500" 
+                          className={`h-12 pl-4 pr-10 bg-gray-50 dark:bg-gray-800 border-2 transition-all duration-300 ${focusedField === "expiryDate"
+                            ? "border-blue-500 dark:border-blue-400 shadow-lg shadow-blue-500/20"
+                            : validationErrors.expiryDate
+                              ? "border-red-500 dark:border-red-500"
                               : "border-gray-200 dark:border-gray-700"
-                          }`}
+                            }`}
                           required
                         />
                         <FiCalendar className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
@@ -479,13 +476,12 @@ const PaymentPage = () => {
                           onBlur={() => setFocusedField("")}
                           maxLength={4}
                           placeholder="123"
-                          className={`h-12 pl-4 pr-10 bg-gray-50 dark:bg-gray-800 border-2 transition-all duration-300 ${
-                            focusedField === "cvv" 
-                              ? "border-blue-500 dark:border-blue-400 shadow-lg shadow-blue-500/20" 
-                              : validationErrors.cvv 
-                              ? "border-red-500 dark:border-red-500" 
+                          className={`h-12 pl-4 pr-10 bg-gray-50 dark:bg-gray-800 border-2 transition-all duration-300 ${focusedField === "cvv"
+                            ? "border-blue-500 dark:border-blue-400 shadow-lg shadow-blue-500/20"
+                            : validationErrors.cvv
+                              ? "border-red-500 dark:border-red-500"
                               : "border-gray-200 dark:border-gray-700"
-                          }`}
+                            }`}
                           required
                         />
                         <FiLock className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500" />
@@ -521,7 +517,7 @@ const PaymentPage = () => {
                     <Button
                       type="submit"
                       disabled={loading || success}
-                      className="w-full h-14 text-lg font-bold bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 dark:from-blue-500 dark:to-purple-500 dark:hover:from-blue-600 dark:hover:to-purple-600 text-white border-none shadow-lg shadow-blue-500/30 dark:shadow-purple-500/30 hover:shadow-xl hover:shadow-blue-500/40 dark:hover:shadow-purple-500/40 transition-all duration-300"
+                      className="w-full h-14 text-lg font-bold bg-blue-600 hover:bg-blue-700 text-white border-none shadow-lg shadow-blue-500/20 hover:shadow-xl hover:shadow-blue-500/30 transition-all duration-300"
                     >
                       {loading ? (
                         <div className="flex items-center gap-3">
@@ -584,7 +580,7 @@ const PaymentPage = () => {
                     <FiDollarSign className="w-5 h-5" />
                     Order Summary
                   </h3>
-                  
+
                   <div className="space-y-3 py-4 border-t border-b border-gray-200 dark:border-gray-800">
                     <div className="flex justify-between text-gray-700 dark:text-gray-300">
                       <span>Course Price</span>
@@ -597,8 +593,8 @@ const PaymentPage = () => {
                   </div>
 
                   <div className="flex justify-between items-center">
-                    <span className="text-lg font-bold text-gray-900 dark:text-white">Total</span>
-                    <span className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 dark:from-blue-400 dark:to-purple-400 bg-clip-text text-transparent">
+                    <span className="text-lg font-bold text-slate-900 dark:text-white">Total</span>
+                    <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">
                       ${classDetails.price}
                     </span>
                   </div>

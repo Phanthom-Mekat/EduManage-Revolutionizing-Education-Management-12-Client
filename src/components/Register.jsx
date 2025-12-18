@@ -33,9 +33,9 @@ const Register = () => {
                 },
                 body: JSON.stringify(userData)
             });
-            
+
             const data = await response.json();
-            
+
             if (response.ok) {
                 toast.success("Registration successful!");
                 return true;
@@ -127,14 +127,14 @@ const Register = () => {
                     <Lottie animationData={LottieLogin} loop={true} />
                 </div>
             </div>
-            
+
             <div className="w-full md:w-1/2 max-w-md z-10">
-            <div className="bg-white/80 dark:bg-gray-800 glass backdrop-blur-lg shadow-xl rounded-2xl p-8 w-full transform transition-all duration-300 hover:shadow-2xl">
+                <div className="bg-white/80 dark:bg-gray-800 glass backdrop-blur-lg shadow-xl rounded-2xl p-8 w-full transform transition-all duration-300 hover:shadow-2xl">
                     <h2 className="text-4xl font-bold text-center text-gray-800 mb-2">
                         Create Account
                     </h2>
                     <p className="text-center text-gray-600 dark:text-gray-300 mb-8">Register to start your journey</p>
-                    
+
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="relative">
                             <div className={`relative group ${isNameFocused ? 'focused' : ''}`}>
@@ -238,12 +238,12 @@ const Register = () => {
                             </div>
                         )}
 
-                        <button 
+                        <button
                             type="submit"
                             className="w-full bg-primary text-white py-3 px-4 rounded-xl hover:bg-primary-dark transform hover:-translate-y-0.5 transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:outline-none shadow-lg hover:shadow-xl"
                         >
                             <DiamondPlus className="w-6 h-6 inline mr-1" />
-                             Create Account
+                            Create Account
                         </button>
 
                         <div className="relative">
@@ -264,11 +264,11 @@ const Register = () => {
                             <span className="text-gray-700 font-medium">Continue with Google</span>
                         </button>
                     </form>
-                    
+
                     <p className="mt-8 text-center text-sm text-gray-600">
                         Already have an account?{' '}
-                        <Link 
-                            to="/auth/login" 
+                        <Link
+                            to="/auth/login"
                             className="text-primary hover:text-primary-dark font-medium transition-colors"
                         >
                             Sign in
@@ -276,7 +276,7 @@ const Register = () => {
                     </p>
                 </div>
             </div>
-            <Toaster 
+            <Toaster
                 position="top-right"
                 toastOptions={{
                     duration: 3000,

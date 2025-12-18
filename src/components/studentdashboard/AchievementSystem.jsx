@@ -3,12 +3,12 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { motion, AnimatePresence } from "framer-motion"
-import { 
-  Trophy, 
-  Award, 
-  Star, 
-  Flame, 
-  Target, 
+import {
+  Trophy,
+  Award,
+  Star,
+  Flame,
+  Target,
   Zap,
   Crown,
   Medal,
@@ -135,7 +135,7 @@ const AchievementSystem = () => {
       const hoursDiff = (now - unlockDate) / (1000 * 60 * 60)
       return hoursDiff < 1
     })
-    
+
     if (recentlyUnlocked) {
       celebrateAchievement()
     }
@@ -149,14 +149,14 @@ const AchievementSystem = () => {
         className="mb-6"
       >
         <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+          <div className="w-12 h-12 rounded-2xl bg-blue-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
             <Trophy className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
               Achievements
             </h1>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            <p className="text-sm text-slate-600 dark:text-slate-400">
               Track your progress and earn rewards
             </p>
           </div>
@@ -170,11 +170,13 @@ const AchievementSystem = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="border-none shadow-lg bg-gradient-to-br from-blue-500 to-blue-600 text-white">
+          <Card className="border-none shadow-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
             <CardContent className="p-6 text-center">
-              <Crown className="w-8 h-8 mx-auto mb-2" />
-              <p className="text-sm opacity-90 mb-1">Level</p>
-              <h3 className="text-3xl font-bold">{userStats.level}</h3>
+              <div className="w-12 h-12 mx-auto bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center mb-3">
+                <Crown className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Level</p>
+              <h3 className="text-3xl font-bold text-slate-900 dark:text-white">{userStats.level}</h3>
             </CardContent>
           </Card>
         </motion.div>
@@ -184,11 +186,13 @@ const AchievementSystem = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card className="border-none shadow-lg bg-gradient-to-br from-purple-500 to-purple-600 text-white">
+          <Card className="border-none shadow-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
             <CardContent className="p-6 text-center">
-              <Star className="w-8 h-8 mx-auto mb-2" />
-              <p className="text-sm opacity-90 mb-1">Points</p>
-              <h3 className="text-3xl font-bold">{userStats.points}</h3>
+              <div className="w-12 h-12 mx-auto bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center mb-3">
+                <Star className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Points</p>
+              <h3 className="text-3xl font-bold text-slate-900 dark:text-white">{userStats.points}</h3>
             </CardContent>
           </Card>
         </motion.div>
@@ -198,11 +202,13 @@ const AchievementSystem = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <Card className="border-none shadow-lg bg-gradient-to-br from-blue-600 to-purple-600 text-white">
+          <Card className="border-none shadow-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
             <CardContent className="p-6 text-center">
-              <Flame className="w-8 h-8 mx-auto mb-2" />
-              <p className="text-sm opacity-90 mb-1">Streak</p>
-              <h3 className="text-3xl font-bold">{userStats.streak}</h3>
+              <div className="w-12 h-12 mx-auto bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center mb-3">
+                <Flame className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Streak</p>
+              <h3 className="text-3xl font-bold text-slate-900 dark:text-white">{userStats.streak}</h3>
             </CardContent>
           </Card>
         </motion.div>
@@ -212,42 +218,43 @@ const AchievementSystem = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
         >
-          <Card className="border-none shadow-lg bg-gradient-to-br from-purple-600 to-blue-600 text-white">
+          <Card className="border-none shadow-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
             <CardContent className="p-6 text-center">
-              <Trophy className="w-8 h-8 mx-auto mb-2" />
-              <p className="text-sm opacity-90 mb-1">Unlocked</p>
-              <h3 className="text-3xl font-bold">{unlockedCount}/{totalAchievements}</h3>
+              <div className="w-12 h-12 mx-auto bg-blue-50 dark:bg-blue-900/20 rounded-xl flex items-center justify-center mb-3">
+                <Trophy className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+              </div>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Unlocked</p>
+              <h3 className="text-3xl font-bold text-slate-900 dark:text-white">{unlockedCount}/{totalAchievements}</h3>
             </CardContent>
           </Card>
         </motion.div>
       </div>
 
-      {/* Level Progress */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
         className="mb-6"
       >
-        <Card className="border-none shadow-lg bg-white dark:bg-gray-900/50 backdrop-blur-xl">
+        <Card className="border-none shadow-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
           <CardContent className="p-6">
             <div className="flex items-center justify-between mb-2">
               <div className="flex items-center gap-2">
                 <TrendingUp className="w-5 h-5 text-blue-600" />
-                <span className="font-semibold text-gray-900 dark:text-gray-100">
+                <span className="font-semibold text-slate-900 dark:text-white">
                   Level {userStats.level}
                 </span>
               </div>
-              <span className="text-sm text-gray-600 dark:text-gray-400">
+              <span className="text-sm text-slate-600 dark:text-slate-400">
                 {nextLevelPoints} points to Level {userStats.level + 1}
               </span>
             </div>
-            <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-3 overflow-hidden">
+            <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-3 overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
                 animate={{ width: `${levelProgress}%` }}
                 transition={{ duration: 1, delay: 0.5 }}
-                className="h-full bg-gradient-to-r from-blue-600 to-purple-600 rounded-full"
+                className="h-full bg-blue-600 rounded-full"
               />
             </div>
           </CardContent>
@@ -257,9 +264,9 @@ const AchievementSystem = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Achievements */}
         <div className="lg:col-span-2">
-          <Card className="border-none shadow-lg bg-white dark:bg-gray-900/50 backdrop-blur-xl">
+          <Card className="border-none shadow-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
+              <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
                 <Award className="w-5 h-5 text-blue-600" />
                 Your Achievements
               </CardTitle>
@@ -274,18 +281,16 @@ const AchievementSystem = () => {
                       animate={{ opacity: 1, scale: 1 }}
                       transition={{ delay: index * 0.05 }}
                     >
-                      <Card className={`border-2 ${
-                        achievement.unlocked
-                          ? "border-blue-500 bg-gradient-to-br from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20"
-                          : "border-gray-200 dark:border-gray-800 opacity-60"
-                      } transition-all hover:shadow-lg`}>
+                      <Card className={`border ${achievement.unlocked
+                          ? "border-blue-200 bg-blue-50/50 dark:border-blue-900 dark:bg-blue-900/10"
+                          : "border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 opacity-60"
+                        } transition-all hover:shadow-md`}>
                         <CardContent className="p-4">
                           <div className="flex items-start gap-3">
-                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
-                              achievement.unlocked
-                                ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white shadow-lg shadow-blue-500/30"
-                                : "bg-gray-200 dark:bg-gray-800 text-gray-400"
-                            }`}>
+                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${achievement.unlocked
+                                ? "bg-blue-100 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400"
+                                : "bg-slate-100 dark:bg-slate-800 text-slate-400"
+                              }`}>
                               {achievement.unlocked ? (
                                 <achievement.icon className="w-6 h-6" />
                               ) : (
@@ -294,34 +299,34 @@ const AchievementSystem = () => {
                             </div>
                             <div className="flex-1">
                               <div className="flex items-start justify-between gap-2">
-                                <h3 className="font-semibold text-gray-900 dark:text-gray-100">
+                                <h3 className="font-semibold text-slate-900 dark:text-white">
                                   {achievement.title}
                                 </h3>
-                                <Badge className={achievement.unlocked 
-                                  ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white" 
-                                  : "bg-gray-200 dark:bg-gray-800 text-gray-600"
+                                <Badge className={achievement.unlocked
+                                  ? "bg-blue-600 text-white hover:bg-blue-700"
+                                  : "bg-slate-100 dark:bg-slate-800 text-slate-600"
                                 }>
                                   {achievement.points}
                                 </Badge>
                               </div>
-                              <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                              <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
                                 {achievement.description}
                               </p>
                               {achievement.unlocked && achievement.unlockedAt && (
-                                <p className="text-xs text-blue-600 mt-2 flex items-center gap-1">
+                                <p className="text-xs text-blue-600 dark:text-blue-400 mt-2 flex items-center gap-1">
                                   <CheckCircle className="w-3 h-3" />
                                   Unlocked {new Date(achievement.unlockedAt).toLocaleDateString()}
                                 </p>
                               )}
                               {!achievement.unlocked && achievement.progress && (
                                 <div className="mt-2">
-                                  <div className="flex justify-between text-xs text-gray-600 dark:text-gray-400 mb-1">
+                                  <div className="flex justify-between text-xs text-slate-600 dark:text-slate-400 mb-1">
                                     <span>Progress</span>
                                     <span>{achievement.progress}%</span>
                                   </div>
-                                  <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1.5">
-                                    <div 
-                                      className="h-full bg-gradient-to-r from-blue-600 to-purple-600 rounded-full"
+                                  <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5">
+                                    <div
+                                      className="h-full bg-blue-600 rounded-full"
                                       style={{ width: `${achievement.progress}%` }}
                                     />
                                   </div>
@@ -340,11 +345,12 @@ const AchievementSystem = () => {
         </div>
 
         {/* Leaderboard */}
+        {/* Leaderboard */}
         <div>
-          <Card className="border-none shadow-lg bg-white dark:bg-gray-900/50 backdrop-blur-xl">
+          <Card className="border-none shadow-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-purple-600" />
+              <CardTitle className="flex items-center gap-2 text-slate-900 dark:text-white">
+                <Trophy className="w-5 h-5 text-blue-600" />
                 Leaderboard
               </CardTitle>
             </CardHeader>
@@ -357,37 +363,34 @@ const AchievementSystem = () => {
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: index * 0.1 }}
                   >
-                    <div className={`flex items-center gap-3 p-3 rounded-xl ${
-                      entry.isCurrentUser
-                        ? "bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-2 border-blue-500"
-                        : "bg-gray-50 dark:bg-gray-800/50"
-                    }`}>
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold ${
-                        entry.rank === 1 ? "bg-yellow-500 text-white" :
-                        entry.rank === 2 ? "bg-gray-400 text-white" :
-                        entry.rank === 3 ? "bg-orange-600 text-white" :
-                        "bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-400"
+                    <div className={`flex items-center gap-3 p-3 rounded-xl ${entry.isCurrentUser
+                        ? "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
+                        : "bg-slate-50 dark:bg-slate-800/50"
                       }`}>
+                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center font-bold ${entry.rank === 1 ? "bg-yellow-500 text-white" :
+                          entry.rank === 2 ? "bg-slate-400 text-white" :
+                            entry.rank === 3 ? "bg-orange-600 text-white" :
+                              "bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-400"
+                        }`}>
                         {entry.rank}
                       </div>
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+                      <div className="w-10 h-10 rounded-full bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center text-blue-600 dark:text-blue-400 font-semibold">
                         {entry.avatar}
                       </div>
                       <div className="flex-1">
-                        <p className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
+                        <p className="font-semibold text-slate-900 dark:text-white text-sm">
                           {entry.name}
                         </p>
-                        <p className="text-xs text-gray-600 dark:text-gray-400 flex items-center gap-1">
-                          <Star className="w-3 h-3" />
+                        <p className="text-xs text-slate-600 dark:text-slate-400 flex items-center gap-1">
+                          <Star className="w-3 h-3 text-blue-500" />
                           {entry.points} points
                         </p>
                       </div>
                       {entry.rank <= 3 && (
-                        <Crown className={`w-5 h-5 ${
-                          entry.rank === 1 ? "text-yellow-500" :
-                          entry.rank === 2 ? "text-gray-400" :
-                          "text-orange-600"
-                        }`} />
+                        <Crown className={`w-5 h-5 ${entry.rank === 1 ? "text-yellow-500" :
+                            entry.rank === 2 ? "text-slate-400" :
+                              "text-orange-600"
+                          }`} />
                       )}
                     </div>
                   </motion.div>
@@ -397,7 +400,7 @@ const AchievementSystem = () => {
           </Card>
 
           {/* Daily Challenge */}
-          <Card className="border-none shadow-lg bg-gradient-to-br from-blue-500 to-purple-600 text-white mt-4">
+          <Card className="border-none shadow-lg bg-blue-600 text-white mt-4">
             <CardContent className="p-6">
               <div className="flex items-start gap-3">
                 <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">

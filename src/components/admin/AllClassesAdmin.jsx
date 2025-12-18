@@ -241,11 +241,10 @@ const AllClassesAdmin = () => {
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                         <div className="absolute top-2 right-2">
-                          <Badge className={`${
-                            classItem.status === "approved" ? "bg-green-500 text-white" :
+                          <Badge className={`${classItem.status === "approved" ? "bg-green-500 text-white" :
                             classItem.status === "pending" ? "bg-yellow-500 text-white" :
-                            "bg-red-500 text-white"
-                          } border-none shadow-lg`}>
+                              "bg-red-500 text-white"
+                            } border-none shadow-lg`}>
                             {classItem.status}
                           </Badge>
                         </div>

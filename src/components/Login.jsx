@@ -57,7 +57,7 @@ const Login = () => {
         signInWithGoogle()
             .then(async (result) => {
                 const loggedUser = result.user;
-                
+
                 // Save user data to database
                 const saveUser = {
                     name: loggedUser.displayName,
@@ -66,7 +66,7 @@ const Login = () => {
                     role: "student",
                     uid: loggedUser.uid
                 };
-    
+
                 try {
                     const response = await fetch('https://edumanagebackend.vercel.app/users', {
                         method: 'POST',
@@ -75,7 +75,7 @@ const Login = () => {
                         },
                         body: JSON.stringify(saveUser)
                     });
-    
+
                     if (response.ok) {
                         setUser(loggedUser);
                         toast.success('Signed in successfully with Google!');
@@ -107,14 +107,14 @@ const Login = () => {
                     <Lottie animationData={LottieLogin} loop={true} />
                 </div>
             </div>
-            
+
             <div className="w-full md:w-1/2 max-w-md z-10">
                 <div className="bg-white/80 dark:bg-gray-800 glass backdrop-blur-lg shadow-xl rounded-2xl p-8 w-full transform transition-all duration-300 hover:shadow-2xl">
                     <h2 className="text-4xl font-bold text-center text-gray-800 mb-2">
                         Welcome Back
                     </h2>
                     <p className="text-center text-gray-600 dark:text-gray-300  mb-8">Sign in to continue your journey</p>
-                    
+
                     <form onSubmit={handleSubmit} className="space-y-6">
                         <div className="relative">
                             <div className={`relative group ${isEmailFocused ? 'focused' : ''}`}>
@@ -174,15 +174,15 @@ const Login = () => {
                         )}
 
                         <div className="flex justify-end">
-                            <Link 
-                                to="/auth/forgot" 
+                            <Link
+                                to="/auth/forgot"
                                 className="text-sm text-primary hover:text-primary-dark transition-colors"
                             >
                                 Forgot password?
                             </Link>
                         </div>
 
-                        <button 
+                        <button
                             type="submit"
                             className="w-full bg-primary text-white py-3 px-4 rounded-xl hover:bg-primary-dark transform hover:-translate-y-0.5 transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:outline-none shadow-lg hover:shadow-xl"
                         >
@@ -208,11 +208,11 @@ const Login = () => {
                             <span className="text-gray-700 font-medium">Continue with Google</span>
                         </button>
                     </form>
-                    
+
                     <p className="mt-8 text-center text-sm text-gray-600">
                         Dont have an account?{' '}
-                        <Link 
-                            to="/auth/register" 
+                        <Link
+                            to="/auth/register"
                             className="text-primary hover:text-primary-dark font-medium transition-colors"
                         >
                             Create an account

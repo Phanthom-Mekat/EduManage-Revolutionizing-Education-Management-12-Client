@@ -68,15 +68,14 @@ const AllClasses = () => {
                   </p>
                 </div>
               </div>
-              
+
               <div className="flex gap-3">
                 <button
                   onClick={() => handleSort("asc")}
-                  className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 ${
-                    sortOrder === "asc"
-                      ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/30 dark:shadow-purple-500/30 scale-105"
-                      : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                  }`}
+                  className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 ${sortOrder === "asc"
+                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/30 dark:shadow-purple-500/30 scale-105"
+                    : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    }`}
                   disabled={loading}
                 >
                   <span className="text-lg">↑</span>
@@ -84,11 +83,10 @@ const AllClasses = () => {
                 </button>
                 <button
                   onClick={() => handleSort("desc")}
-                  className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 ${
-                    sortOrder === "desc"
-                      ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/30 dark:shadow-purple-500/30 scale-105"
-                      : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
-                  }`}
+                  className={`px-6 py-3 rounded-xl font-semibold transition-all duration-300 flex items-center gap-2 ${sortOrder === "desc"
+                    ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/30 dark:shadow-purple-500/30 scale-105"
+                    : "bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700"
+                    }`}
                   disabled={loading}
                 >
                   <span className="text-lg">↓</span>

@@ -83,7 +83,7 @@ const Users = () => {
   };
 
   const getRoleIcon = (role) => {
-    switch(role) {
+    switch (role) {
       case "admin": return Shield;
       case "teacher": return GraduationCap;
       default: return UserIcon;
@@ -255,11 +255,10 @@ const Users = () => {
                           {user.email}
                         </p>
                         <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2">
-                          <Badge className={`${
-                            user.role === "admin" ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300" :
+                          <Badge className={`${user.role === "admin" ? "bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300" :
                             user.role === "teacher" ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300" :
-                            "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300"
-                          } border-none`}>
+                              "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300"
+                            } border-none`}>
                             <RoleIcon className="w-3 h-3 mr-1" />
                             {user.role}
                           </Badge>

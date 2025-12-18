@@ -10,7 +10,7 @@ import { FadeIn } from "@/components/ui/micro-interactions";
 import { motion } from "framer-motion";
 
 const MyEnrollClass = () => {
-  const {user} = useContext(AuthContext);
+  const { user } = useContext(AuthContext);
   const [enrolledClasses, setEnrolledClasses] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -24,11 +24,11 @@ const MyEnrollClass = () => {
         const users = await res.json();
         const userId = users.find((u) => u.email === user?.email)?.uid;
         const response = await fetch(`https://edumanagebackend.vercel.app/enrolled-classes/${userId}`);
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch enrolled classes');
         }
-        
+
         const data = await response.json();
         setEnrolledClasses(data.enrolledClasses);
       } catch (err) {
@@ -45,8 +45,8 @@ const MyEnrollClass = () => {
 
   const filteredClasses = enrolledClasses.filter(classItem => {
     const matchesSearch = classItem.title?.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = 
-      filter === 'all' || 
+    const matchesFilter =
+      filter === 'all' ||
       (filter === 'completed' && (classItem.progress || 0) === 100) ||
       (filter === 'in-progress' && (classItem.progress || 0) < 100 && (classItem.progress || 0) > 0) ||
       (filter === 'not-started' && (classItem.progress || 0) === 0);
@@ -102,11 +102,10 @@ const MyEnrollClass = () => {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <FadeIn delay={0.1}>
           <motion.div whileHover={{ y: -2 }} className="cursor-pointer" onClick={() => setFilter('all')}>
-            <Card className={`border-none shadow-sm transition-all duration-300 ${
-              filter === 'all' 
-                ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white' 
-                : 'bg-white dark:bg-gray-900/50 hover:shadow-lg'
-            }`}>
+            <Card className={`border-none shadow-sm transition-all duration-300 ${filter === 'all'
+              ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white'
+              : 'bg-white dark:bg-gray-900/50 hover:shadow-lg'
+              }`}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -126,11 +125,10 @@ const MyEnrollClass = () => {
 
         <FadeIn delay={0.2}>
           <motion.div whileHover={{ y: -2 }} className="cursor-pointer" onClick={() => setFilter('in-progress')}>
-            <Card className={`border-none shadow-sm transition-all duration-300 ${
-              filter === 'in-progress' 
-                ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white' 
-                : 'bg-white dark:bg-gray-900/50 hover:shadow-lg'
-            }`}>
+            <Card className={`border-none shadow-sm transition-all duration-300 ${filter === 'in-progress'
+              ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white'
+              : 'bg-white dark:bg-gray-900/50 hover:shadow-lg'
+              }`}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -150,11 +148,10 @@ const MyEnrollClass = () => {
 
         <FadeIn delay={0.3}>
           <motion.div whileHover={{ y: -2 }} className="cursor-pointer" onClick={() => setFilter('completed')}>
-            <Card className={`border-none shadow-sm transition-all duration-300 ${
-              filter === 'completed' 
-                ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white' 
-                : 'bg-white dark:bg-gray-900/50 hover:shadow-lg'
-            }`}>
+            <Card className={`border-none shadow-sm transition-all duration-300 ${filter === 'completed'
+              ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white'
+              : 'bg-white dark:bg-gray-900/50 hover:shadow-lg'
+              }`}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -174,11 +171,10 @@ const MyEnrollClass = () => {
 
         <FadeIn delay={0.4}>
           <motion.div whileHover={{ y: -2 }} className="cursor-pointer" onClick={() => setFilter('not-started')}>
-            <Card className={`border-none shadow-sm transition-all duration-300 ${
-              filter === 'not-started' 
-                ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white' 
-                : 'bg-white dark:bg-gray-900/50 hover:shadow-lg'
-            }`}>
+            <Card className={`border-none shadow-sm transition-all duration-300 ${filter === 'not-started'
+              ? 'bg-gradient-to-br from-blue-600 to-purple-600 text-white'
+              : 'bg-white dark:bg-gray-900/50 hover:shadow-lg'
+              }`}>
               <CardContent className="p-4">
                 <div className="flex items-center justify-between">
                   <div>
@@ -240,13 +236,12 @@ const MyEnrollClass = () => {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
                   <div className="absolute top-3 right-3">
-                    <Badge className={`${
-                      (classItem.progress || 0) === 100 
-                        ? 'bg-green-500 text-white'
-                        : (classItem.progress || 0) > 0
+                    <Badge className={`${(classItem.progress || 0) === 100
+                      ? 'bg-green-500 text-white'
+                      : (classItem.progress || 0) > 0
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-500 text-white'
-                    } border-none`}>
+                      } border-none`}>
                       {(classItem.progress || 0) === 100 ? 'Completed' : (classItem.progress || 0) > 0 ? 'In Progress' : 'Not Started'}
                     </Badge>
                   </div>
