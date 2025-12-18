@@ -4,10 +4,10 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Badge } from "@/components/ui/badge"
 import { motion, AnimatePresence } from "framer-motion"
-import { 
-  MessageCircle, 
-  Send, 
-  Sparkles, 
+import {
+  MessageCircle,
+  Send,
+  Sparkles,
   Loader2,
   Bot,
   User,
@@ -15,6 +15,8 @@ import {
   BookOpen
 } from "lucide-react"
 import toast from "react-hot-toast"
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 
 const AIStudyBuddy = () => {
   const [messages, setMessages] = useState([
@@ -180,11 +182,10 @@ const AIStudyBuddy = () => {
                     exit={{ opacity: 0 }}
                     className={`flex gap-3 ${message.type === "user" ? "flex-row-reverse" : ""}`}
                   >
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                      message.type === "user" 
-                        ? "bg-gradient-to-br from-purple-500 to-blue-600" 
+                    <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${message.type === "user"
+                        ? "bg-gradient-to-br from-purple-500 to-blue-600"
                         : "bg-gradient-to-br from-blue-500 to-purple-600"
-                    }`}>
+                      }`}>
                       {message.type === "user" ? (
                         <User className="w-4 h-4 text-white" />
                       ) : (
@@ -192,12 +193,37 @@ const AIStudyBuddy = () => {
                       )}
                     </div>
                     <div className={`flex-1 max-w-[75%] ${message.type === "user" ? "text-right" : ""}`}>
-                      <div className={`inline-block p-4 rounded-2xl ${
-                        message.type === "user"
+                      <div className={`inline-block p-4 rounded-2xl ${message.type === "user"
                           ? "bg-gradient-to-br from-blue-500 to-purple-600 text-white"
                           : "bg-gray-100 dark:bg-gray-800 text-gray-900 dark:text-gray-100"
-                      }`}>
-                        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+                        }`}>
+                        <ReactMarkdown
+                          title="msg"
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            ul: ({ node, ...props }) => <ul className="list-disc ml-4 mt-2 space-y-1" {...props} />,
+                            ol: ({ node, ...props }) => <ol className="list-decimal ml-4 mt-2 space-y-1" {...props} />,
+                            li: ({ node, ...props }) => <li className="mb-1" {...props} />,
+                            p: ({ node, ...props }) => <p className="mb-2 last:mb-0 whitespace-pre-wrap" {...props} />,
+                            strong: ({ node, ...props }) => <span className="font-bold" {...props} />,
+                            h1: ({ node, ...props }) => <h1 className="text-xl font-bold mb-2 mt-2" {...props} />,
+                            h2: ({ node, ...props }) => <h2 className="text-lg font-bold mb-2 mt-2" {...props} />,
+                            h3: ({ node, ...props }) => <h3 className="text-md font-bold mb-1 mt-2" {...props} />,
+                            code: ({ node, inline, className, children, ...props }) => {
+                              return inline ? (
+                                <code className="bg-black/20 dark:bg-black/40 px-1 py-0.5 rounded text-xs font-mono" {...props}>
+                                  {children}
+                                </code>
+                              ) : (
+                                <code className="block bg-black/20 dark:bg-black/40 p-2 rounded text-xs font-mono my-2 overflow-x-auto" {...props}>
+                                  {children}
+                                </code>
+                              )
+                            }
+                          }}
+                        >
+                          {message.content}
+                        </ReactMarkdown>
                       </div>
                       <p className="text-xs text-gray-500 mt-1 px-2">
                         {new Date(message.timestamp).toLocaleTimeString()}
