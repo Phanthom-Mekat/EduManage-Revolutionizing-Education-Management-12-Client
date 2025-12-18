@@ -5,7 +5,7 @@ import axios from "axios"
 import CreateAssignmentModal from "./CreateAssignmentModal"
 import { useLoaderData } from "react-router-dom"
 import { motion } from "framer-motion"
-import { Users, FileCheck, Send, Plus, TrendingUp, Link2, Copy, Check } from "lucide-react"
+import { Users, FileCheck, Send, Plus, TrendingUp, Link2, Copy, Check, ExternalLink } from "lucide-react"
 
 const ClassDetails = () => {
   const loaderData = useLoaderData()
@@ -13,8 +13,8 @@ const ClassDetails = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [copied, setCopied] = useState(false)
 
-  // Generate class meeting link
-  const classLink = classDetails ? `https://meet.google.com/${classDetails._id.substring(0, 3)}-${classDetails._id.substring(3, 7)}-${classDetails._id.substring(7, 10)}` : ''
+  // Class meeting link
+  const classLink = "https://meet.google.com/xjk-bfrn-cyw"
 
   const copyClassLink = () => {
     navigator.clipboard.writeText(classLink)
@@ -103,27 +103,37 @@ const ClassDetails = () => {
                   <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{classLink}</p>
                 </div>
               </div>
-              <Button
-                onClick={copyClassLink}
-                variant="outline"
-                size="sm"
-                className={`flex-shrink-0 transition-all duration-200 ${copied
-                  ? 'bg-green-50 border-green-500 text-green-600 dark:bg-green-900/20 dark:border-green-400 dark:text-green-400'
-                  : 'hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-600 dark:hover:bg-indigo-900/20'
-                  }`}
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-4 h-4 mr-1" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4 mr-1" />
-                    Copy Link
-                  </>
-                )}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => window.open(classLink, '_blank')}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white border-none transition-colors"
+                  size="sm"
+                >
+                  <ExternalLink className="w-4 h-4 mr-1" />
+                  Join Class
+                </Button>
+                <Button
+                  onClick={copyClassLink}
+                  variant="outline"
+                  size="sm"
+                  className={`flex-shrink-0 transition-all duration-200 ${copied
+                    ? 'bg-green-50 border-green-500 text-green-600 dark:bg-green-900/20 dark:border-green-400 dark:text-green-400'
+                    : 'hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-600 dark:hover:bg-indigo-900/20'
+                    }`}
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-4 h-4 mr-1" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 mr-1" />
+                      Copy Link
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>

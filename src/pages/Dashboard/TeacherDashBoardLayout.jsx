@@ -2,14 +2,14 @@ import { useState, useEffect, useContext } from 'react';
 import { Link, NavLink, Outlet, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from '@/components/ui/card';
-import { 
-  LayoutDashboard, 
-  PlusCircle, 
-  BookOpen, 
-  User, 
-  LogOut, 
-  Menu, 
-  X, 
+import {
+  LayoutDashboard,
+  PlusCircle,
+  BookOpen,
+  User,
+  LogOut,
+  Menu,
+  X,
   Home,
   Users,
   FileCheck,
@@ -22,6 +22,8 @@ import { AuthContext } from "@/provider/AuthProvider";
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import { motion, AnimatePresence } from "framer-motion";
 import { ThemeToggle } from "@/components/ui/theme-toggle";
+import PageTitle from "@/components/PageTitle";
+
 
 const TeacherDashBoardLayout = () => {
   const { user, logOut } = useContext(AuthContext);
@@ -48,12 +50,12 @@ const TeacherDashBoardLayout = () => {
         const response = await fetch(`https://edumanagebackend.vercel.app/classes?instructorEmail=${user?.email}`);
         const data = await response.json();
         setClasses(data.classes || []);
-        
-        
+
+
         const totalStudents = data.classes?.reduce((acc, cls) => acc + (cls.totalEnrollment || 0), 0) || 0;
         const totalAssignments = data.classes?.reduce((acc, cls) => acc + (cls.totalAssignments || 0), 0) || 0;
         const avgRating = data.classes?.reduce((acc, cls) => acc + (cls.averageRating || 0), 0) / (data.classes?.length || 1);
-        
+
         setStats({
           totalStudents,
           totalClasses: data.classes?.length || 0,
@@ -240,22 +242,22 @@ const TeacherDashBoardLayout = () => {
                     <BarChart data={enrollmentData}>
                       <defs>
                         <linearGradient id="barGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.8}/>
-                          <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.8}/>
+                          <stop offset="0%" stopColor="#3b82f6" stopOpacity={0.8} />
+                          <stop offset="100%" stopColor="#8b5cf6" stopOpacity={0.8} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
-                      <XAxis 
-                        dataKey="name" 
-                        tick={{ fill: 'currentColor' }} 
+                      <XAxis
+                        dataKey="name"
+                        tick={{ fill: 'currentColor' }}
                         className="text-xs text-gray-600 dark:text-gray-400"
                       />
-                      <YAxis 
-                        tick={{ fill: 'currentColor' }} 
+                      <YAxis
+                        tick={{ fill: 'currentColor' }}
                         className="text-xs text-gray-600 dark:text-gray-400"
                       />
-                      <Tooltip 
-                        contentStyle={{ 
+                      <Tooltip
+                        contentStyle={{
                           backgroundColor: 'rgba(255, 255, 255, 0.95)',
                           border: 'none',
                           borderRadius: '12px',
@@ -288,43 +290,43 @@ const TeacherDashBoardLayout = () => {
                     <LineChart data={assignmentData}>
                       <defs>
                         <linearGradient id="submittedGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#10b981" stopOpacity={0.8}/>
-                          <stop offset="100%" stopColor="#059669" stopOpacity={0.8}/>
+                          <stop offset="0%" stopColor="#10b981" stopOpacity={0.8} />
+                          <stop offset="100%" stopColor="#059669" stopOpacity={0.8} />
                         </linearGradient>
                         <linearGradient id="totalGradient" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.8}/>
-                          <stop offset="100%" stopColor="#d97706" stopOpacity={0.8}/>
+                          <stop offset="0%" stopColor="#f59e0b" stopOpacity={0.8} />
+                          <stop offset="100%" stopColor="#d97706" stopOpacity={0.8} />
                         </linearGradient>
                       </defs>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-gray-200 dark:stroke-gray-700" />
-                      <XAxis 
-                        dataKey="name" 
-                        tick={{ fill: 'currentColor' }} 
+                      <XAxis
+                        dataKey="name"
+                        tick={{ fill: 'currentColor' }}
                         className="text-xs text-gray-600 dark:text-gray-400"
                       />
-                      <YAxis 
-                        tick={{ fill: 'currentColor' }} 
+                      <YAxis
+                        tick={{ fill: 'currentColor' }}
                         className="text-xs text-gray-600 dark:text-gray-400"
                       />
-                      <Tooltip 
-                        contentStyle={{ 
+                      <Tooltip
+                        contentStyle={{
                           backgroundColor: 'rgba(255, 255, 255, 0.95)',
                           border: 'none',
                           borderRadius: '12px',
                           boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'
                         }}
                       />
-                      <Line 
-                        type="monotone" 
-                        dataKey="submitted" 
+                      <Line
+                        type="monotone"
+                        dataKey="submitted"
                         stroke="url(#submittedGradient)"
                         strokeWidth={3}
                         dot={{ fill: '#10b981', r: 4 }}
                         name="Submitted"
                       />
-                      <Line 
-                        type="monotone" 
-                        dataKey="total" 
+                      <Line
+                        type="monotone"
+                        dataKey="total"
                         stroke="url(#totalGradient)"
                         strokeWidth={3}
                         dot={{ fill: '#f59e0b', r: 4 }}
@@ -400,146 +402,147 @@ const TeacherDashBoardLayout = () => {
   );
 
   return (
-    <div className="flex h-screen bg-gray-50 dark:bg-gray-950">
-      <AnimatePresence>
-        {/* Mobile Sidebar Overlay */}
-        {isSidebarOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-20 lg:hidden"
-            onClick={() => setIsSidebarOpen(false)}
-          />
-        )}
-      </AnimatePresence>
-
-      {/* Sidebar */}
-      <aside
-        className={`fixed lg:static w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 h-full z-30 transform transition-transform duration-300 ease-in-out ${
-          isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
-        }`}
-      >
-        <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="flex items-center justify-between h-20 px-6 border-b border-gray-200 dark:border-gray-800">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
-                <GraduationCap className="w-6 h-6 text-white" />
-              </div>
-              <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                TeacherHub
-              </h1>
-            </div>
-            <button
-              className="lg:hidden text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+    <>
+      <PageTitle />
+      <div className="flex h-screen bg-gray-50 dark:bg-gray-950">
+        <AnimatePresence>
+          {/* Mobile Sidebar Overlay */}
+          {isSidebarOpen && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/50 backdrop-blur-sm z-20 lg:hidden"
               onClick={() => setIsSidebarOpen(false)}
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
+            />
+          )}
+        </AnimatePresence>
 
-          {/* Navigation */}
-          <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
-            {navItems.map((item, index) => (
-              <motion.div
-                key={item.path}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
+        {/* Sidebar */}
+        <aside
+          className={`fixed lg:static w-64 bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 h-full z-30 transform transition-transform duration-300 ease-in-out ${isSidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+            }`}
+        >
+          <div className="flex flex-col h-full">
+            {/* Logo */}
+            <div className="flex items-center justify-between h-20 px-6 border-b border-gray-200 dark:border-gray-800">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+                  <GraduationCap className="w-6 h-6 text-white" />
+                </div>
+                <h1 className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  TeacherHub
+                </h1>
+              </div>
+              <button
+                className="lg:hidden text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200"
+                onClick={() => setIsSidebarOpen(false)}
               >
-                <NavLink
-                  to={item.path}
-                  end={item.path === "/teacher"}
-                  className={({ isActive }) =>
-                    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                      isActive
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+
+            {/* Navigation */}
+            <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
+              {navItems.map((item, index) => (
+                <motion.div
+                  key={item.path}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: index * 0.1 }}
+                >
+                  <NavLink
+                    to={item.path}
+                    end={item.path === "/teacher"}
+                    className={({ isActive }) =>
+                      `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${isActive
                         ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg shadow-blue-500/30"
                         : "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
-                    }`
-                  }
-                  onClick={() => setIsSidebarOpen(false)}
-                >
-                  <item.icon className="w-5 h-5" />
-                  <span>{item.label}</span>
-                </NavLink>
-              </motion.div>
-            ))}
-          </nav>
+                      }`
+                    }
+                    onClick={() => setIsSidebarOpen(false)}
+                  >
+                    <item.icon className="w-5 h-5" />
+                    <span>{item.label}</span>
+                  </NavLink>
+                </motion.div>
+              ))}
+            </nav>
 
-          {/* Bottom Actions */}
-          <div className="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
-            <Link to="/">
+            {/* Bottom Actions */}
+            <div className="p-4 border-t border-gray-200 dark:border-gray-800 space-y-2">
+              <Link to="/">
+                <Button
+                  variant="ghost"
+                  className="w-full justify-start text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  <Home className="mr-3 h-5 w-5" />
+                  Home
+                </Button>
+              </Link>
               <Button
                 variant="ghost"
-                className="w-full justify-start text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                className="w-full justify-start text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
+                onClick={handleLogout}
               >
-                <Home className="mr-3 h-5 w-5" />
-                Home
+                <LogOut className="mr-3 h-5 w-5" />
+                Logout
               </Button>
-            </Link>
-            <Button
-              variant="ghost"
-              className="w-full justify-start text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20"
-              onClick={handleLogout}
-            >
-              <LogOut className="mr-3 h-5 w-5" />
-              Logout
-            </Button>
-          </div>
-        </div>
-      </aside>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Header */}
-        <header className="h-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
-          <div className="h-full px-4 lg:px-8 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                className="lg:hidden p-2 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-                onClick={() => setIsSidebarOpen(true)}
-              >
-                <Menu className="h-5 w-5" />
-              </button>
-              <div>
-                <h2 className="text-lg lg:text-xl font-bold text-gray-900 dark:text-white">
-                  Teacher Dashboard
-                </h2>
-                <p className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">
-                  Manage your classes and track student progress
-                </p>
-              </div>
             </div>
+          </div>
+        </aside>
 
-            <div className="flex items-center gap-3">
-              <ThemeToggle />
-              <div className="hidden sm:flex flex-col items-end mr-3">
-                <span className="text-sm font-semibold text-gray-900 dark:text-white">
-                  {user?.displayName}
-                </span>
-                <span className="text-xs text-gray-500 dark:text-gray-400">Teacher</span>
-              </div>
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <div className="relative">
-                  <img
-                    src={user?.photoURL || "/placeholder.svg"}
-                    alt="Profile"
-                    className="w-10 h-10 rounded-xl object-cover ring-2 ring-gray-200 dark:ring-gray-700"
-                  />
-                  <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white dark:border-gray-900" />
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Header */}
+          <header className="h-20 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border-b border-gray-200 dark:border-gray-800 sticky top-0 z-10">
+            <div className="h-full px-4 lg:px-8 flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                <button
+                  className="lg:hidden p-2 rounded-xl text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                  onClick={() => setIsSidebarOpen(true)}
+                >
+                  <Menu className="h-5 w-5" />
+                </button>
+                <div>
+                  <h2 className="text-lg lg:text-xl font-bold text-gray-900 dark:text-white">
+                    Teacher Dashboard
+                  </h2>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 hidden sm:block">
+                    Manage your classes and track student progress
+                  </p>
                 </div>
-              </motion.div>
-            </div>
-          </div>
-        </header>
+              </div>
 
-        {/* Content */}
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-950 p-4 lg:p-8">
-          {window.location.pathname === '/teacher' ? <DashboardContent /> : <Outlet />}
-        </main>
+              <div className="flex items-center gap-3">
+                <ThemeToggle />
+                <div className="hidden sm:flex flex-col items-end mr-3">
+                  <span className="text-sm font-semibold text-gray-900 dark:text-white">
+                    {user?.displayName}
+                  </span>
+                  <span className="text-xs text-gray-500 dark:text-gray-400">Teacher</span>
+                </div>
+                <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                  <div className="relative">
+                    <img
+                      src={user?.photoURL || "/placeholder.svg"}
+                      alt="Profile"
+                      className="w-10 h-10 rounded-xl object-cover ring-2 ring-gray-200 dark:ring-gray-700"
+                    />
+                    <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 rounded-full border-2 border-white dark:border-gray-900" />
+                  </div>
+                </motion.div>
+              </div>
+            </div>
+          </header>
+
+          {/* Content */}
+          <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 dark:bg-gray-950 p-4 lg:p-8">
+            {window.location.pathname === '/teacher' ? <DashboardContent /> : <Outlet />}
+          </main>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

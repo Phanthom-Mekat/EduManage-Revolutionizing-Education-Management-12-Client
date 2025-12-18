@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Rating } from "react-simple-star-rating";
-import { Loader2, Upload, Calendar, FileText, CheckCircle, Star, ArrowLeft, AlertCircle, User, Link2, Copy, Check } from "lucide-react";
+import { Loader2, Upload, Calendar, FileText, CheckCircle, Star, ArrowLeft, AlertCircle, User, Link2, Copy, Check, ExternalLink } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AuthContext } from "@/provider/AuthProvider";
 import { motion } from "framer-motion";
@@ -45,8 +45,8 @@ const MyEnrollClassDetails = () => {
   const [submitSuccess, setSubmitSuccess] = useState(null);
   const [copied, setCopied] = useState(false);
 
-  // Generate class meeting link
-  const classLink = `https://meet.google.com/${id.substring(0, 3)}-${id.substring(3, 7)}-${id.substring(7, 10)}`;
+  // Class meeting link
+  const classLink = "https://meet.google.com/xjk-bfrn-cyw";
 
   const copyClassLink = () => {
     navigator.clipboard.writeText(classLink);
@@ -348,27 +348,37 @@ const MyEnrollClassDetails = () => {
                   <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{classLink}</p>
                 </div>
               </div>
-              <Button
-                onClick={copyClassLink}
-                variant="outline"
-                size="sm"
-                className={`flex-shrink-0 transition-all duration-200 ${copied
-                  ? 'bg-green-50 border-green-500 text-green-600 dark:bg-green-900/20 dark:border-green-400 dark:text-green-400'
-                  : 'hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-600 dark:hover:bg-indigo-900/20'
-                  }`}
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-4 h-4 mr-1" />
-                    Copied!
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4 mr-1" />
-                    Copy Link
-                  </>
-                )}
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  onClick={() => window.open(classLink, '_blank')}
+                  className="bg-indigo-600 hover:bg-indigo-700 text-white border-none transition-colors"
+                  size="sm"
+                >
+                  <ExternalLink className="w-4 h-4 mr-1" />
+                  Join Class
+                </Button>
+                <Button
+                  onClick={copyClassLink}
+                  variant="outline"
+                  size="sm"
+                  className={`flex-shrink-0 transition-all duration-200 ${copied
+                    ? 'bg-green-50 border-green-500 text-green-600 dark:bg-green-900/20 dark:border-green-400 dark:text-green-400'
+                    : 'hover:bg-indigo-50 hover:border-indigo-500 hover:text-indigo-600 dark:hover:bg-indigo-900/20'
+                    }`}
+                >
+                  {copied ? (
+                    <>
+                      <Check className="w-4 h-4 mr-1" />
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-4 h-4 mr-1" />
+                      Copy Link
+                    </>
+                  )}
+                </Button>
+              </div>
             </div>
           </CardContent>
         </Card>
