@@ -67,13 +67,15 @@ const PageTitle = ({ customTitle }) => {
 
     // Format: "Page Title | EduManage" or just "EduManage" for home
     const fullTitle = pageTitle === 'Home' || pageTitle === 'EduManage'
-        ? `${baseTitle} - Revolutionizing Education`
+        ? `${baseTitle} - by Jahidul Hossain Mekat`
         : `${pageTitle} | ${baseTitle}`;
 
     return (
         <Helmet>
             <title>{fullTitle}</title>
-            <meta name="description" content={`${pageTitle} - EduManage is your premier education management platform for students, teachers, and administrators.`} />
+            <meta name="description" content={`${pageTitle} - EduManage is a comprehensive education management platform developed by Jahidul Hossain Mekat. Empowering students and teachers with AI-driven tools.`} />
+            <meta name="keywords" content="Jahidul Hossain Mekat, EduManage, Education Management, AI Engineer, Web Development, Student, Researcher, Independent University Dhaka" />
+            <meta name="author" content="Jahidul Hossain Mekat" />
             <link rel="icon" type="image/svg+xml" href="/edumanage-favicon.svg" />
         </Helmet>
     );
